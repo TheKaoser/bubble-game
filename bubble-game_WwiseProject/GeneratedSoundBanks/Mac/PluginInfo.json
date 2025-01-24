@@ -1,0 +1,14 @@
+{
+ "PluginInfo": {
+  "Platform": "Mac",
+  "BasePlatform": "Mac",
+  "PluginLibs": [
+   {
+    "LibName": "System",
+    "LibId": "11403271",
+    "Type": "AudioDevice"
+   }
+  ],
+  "FileHash": "{1E8A8517-31F8-066C-5E8F-543B0E9E9E3A}"
+ }
+}

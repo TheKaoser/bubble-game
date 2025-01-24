@@ -1,0 +1,14 @@
+{
+ "PluginInfo": {
+  "Platform": "Windows",
+  "BasePlatform": "Windows",
+  "PluginLibs": [
+   {
+    "LibName": "System",
+    "LibId": "11403271",
+    "Type": "AudioDevice"
+   }
+  ],
+  "FileHash": "{1A883665-9CEB-9946-02AA-43355008D561}"
+ }
+}
