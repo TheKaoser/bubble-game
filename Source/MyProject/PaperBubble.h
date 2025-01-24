@@ -13,9 +13,6 @@ UCLASS()
 class MYPROJECT_API APaperBubble : public APaperCharacter
 {
 	GENERATED_BODY()
-	
-public:
-    APaperBubble();
 
 protected:
     virtual void BeginPlay() override;
