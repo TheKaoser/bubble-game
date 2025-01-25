@@ -26,10 +26,6 @@ APaperBubble::APaperBubble()
 
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APaperBubble::OnOverlapBegin);
 
-    // Create and attach the physics constraint component
-    PhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("PhysicsConstraint"));
-    PhysicsConstraint->SetupAttachment(RootComponent);
-
     // Create and attach the cable component
     CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("CableComponent"));
     CableComponent->SetupAttachment(RootComponent);
@@ -55,22 +51,15 @@ void APaperBubble::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    for (TObjectIterator<AHitActor> It; It; ++It)
-    {
-        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE and CurrentBubbleType == BubbleType::GumBubble)
-        {
-            AActor* OtherActor = *It;
-            if (OtherActor->Tags.Contains("AttachmentPoint"))
-                UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), FVector::Dist(GetActorLocation(), OtherActor->GetActorLocation()));
-            if (OtherActor->Tags.Contains("AttachmentPoint") && FVector::Dist(GetActorLocation(), OtherActor->GetActorLocation()) < 1000)
-            {
-                // if not attached
-                UE_LOG(LogTemp, Warning, TEXT("Attach to object!"));
-                AttachToObject(OtherActor);
-                
-            }
-        }
-    }
+    // for (TObjectIterator<AHitActor> It; It; ++It)
+    // {
+    //     if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE and CurrentBubbleType == BubbleType::GumBubble)
+    //     {
+    //         AActor* OtherActor = *It;
+    //         if (OtherActor->Tags.Contains("AttachmentPoint"))
+    //             UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), FVector::Dist(GetActorLocation(), OtherActor->GetActorLocation()));
+    //     }
+    // }
 }
 
 void APaperBubble::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -101,7 +90,26 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
-        // else change flipbook
+        else
+        {
+            FHitResult HitResult;
+            FVector Start = GetActorLocation();
+            FVector End = Start + FVector(0.0f, 0.0f, 500.0f);
+            FCollisionQueryParams CollisionParams;
+            CollisionParams.AddIgnoredActor(this);
+
+            // paint ray
+            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
+
+            if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
+                {
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
+                }
+            }
+        }
     }
 }
 
@@ -112,6 +120,26 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -MovementValue * 10.0f), true);
+        else
+        {
+            FHitResult HitResult;
+            FVector Start = GetActorLocation();
+            FVector End = Start + FVector(0.0f, 0.0f, -500.0f);
+            FCollisionQueryParams CollisionParams;
+            CollisionParams.AddIgnoredActor(this);
+
+            // paint ray
+            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
+
+            if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
+                {
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -MovementValue * 10.0f), true);
+                }
+            }
+        }
     }
 }
 
@@ -122,6 +150,26 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(MovementValue * 10.0f, 0.0f, 0.0f), true);
+        else
+        {
+            FHitResult HitResult;
+            FVector Start = GetActorLocation();
+            FVector End = Start + FVector(500.0f, 0.0f, 0.0f);
+            FCollisionQueryParams CollisionParams;
+            CollisionParams.AddIgnoredActor(this);
+
+            // paint ray
+            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
+
+            if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
+                {
+                    GetCharacterMovement()->AddImpulse(FVector(MovementValue * 10.0f, 0.0f, 0.0f), true);
+                }
+            }
+        }
     }    
 }
 
@@ -132,6 +180,26 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(-MovementValue * 10.0f, 0.0f, 0.0f), true);
+        else
+        {
+            FHitResult HitResult;
+            FVector Start = GetActorLocation();
+            FVector End = Start + FVector(-500.0f, 0.0f, 0.0f);
+            FCollisionQueryParams CollisionParams;
+            CollisionParams.AddIgnoredActor(this);
+
+            // paint ray
+            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
+
+            if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
+                {
+                    GetCharacterMovement()->AddImpulse(FVector(-MovementValue * 10.0f, 0.0f, 0.0f), true);
+                }
+            }
+        }
     }
 }
 
@@ -153,38 +221,11 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
     }
 }
 
-void APaperBubble::AttachToObject(AActor* OtherActor)
-{
-    // Attach the bubble to the other actor using a physics constraint
-    PhysicsConstraint->SetConstrainedComponents(GetCapsuleComponent(), NAME_None, Cast<UPrimitiveComponent>(OtherActor->GetRootComponent()), NAME_None);
-
-    // Set the linear limits to constrain the movement
-    PhysicsConstraint->SetLinearXLimit(LCM_Limited, 1000.0f); // Set the max length in the X direction
-    PhysicsConstraint->SetLinearYLimit(LCM_Limited, 1000.0f); // Set the max length in the Y direction
-    PhysicsConstraint->SetLinearZLimit(LCM_Limited, 1000.0f); // Set the max length in the Z direction
-    
-    PhysicsConstraint->SetLinearPositionDrive(true, true, true);
-
-    PhysicsConstraint->SetAngularSwing1Limit(ACM_Limited, 1000.0f); // Swing1 limit (e.g., pitch)
-    PhysicsConstraint->SetAngularSwing2Limit(ACM_Limited, 1000.0f); // Swing2 limit (e.g., yaw)
-    PhysicsConstraint->SetAngularTwistLimit(ACM_Limited, 1000.0f); 
-
-    PhysicsConstraint->SetAngularOrientationDrive(true, true);
-
-    GetCapsuleComponent()->SetSimulatePhysics(true);
-
-    CableComponent->SetVisibility(true);
-    CableComponent->SetAttachEndToComponent(Cast<USceneComponent>(OtherActor->GetRootComponent()));
-    CableComponent->EndLocation = FVector::ZeroVector;
-    
-    UE_LOG(LogTemp, Warning, TEXT("Attached to object!"));
-}
-
 void APaperBubble::ChangeBehavior()
 {
     GetCharacterMovement()->StopMovementImmediately();
     GetCharacterMovement()->GravityScale = 1.0f;
     CurrentBubbleType = BubbleType::GumBubble;
     // simulate physics
-    GetCapsuleComponent()->SetSimulatePhysics(true);
+    // GetCapsuleComponent()->SetSimulatePhysics(true);
 }
