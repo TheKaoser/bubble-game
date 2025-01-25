@@ -12,7 +12,8 @@ UENUM(BlueprintType)
 enum class BubbleType : uint8
 {
     SoapBubble,
-    GumBubble
+    GumBubble,
+    TransitionBubble
 };
 
 UCLASS()
@@ -60,6 +61,7 @@ public:
 
     UFUNCTION()
     void ChangeBehavior();
+    void ChangeLevel();
     
     // current bubble type
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bubble")
@@ -67,4 +69,7 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     class UCableComponent* CableComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class APaperFlipbookActor* PaperFlipbookActor;
 };

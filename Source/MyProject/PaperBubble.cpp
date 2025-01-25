@@ -16,26 +16,22 @@
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CableComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "PaperFlipbookComponent.h"
+#include "PaperFlipbookActor.h"
 
 APaperBubble::APaperBubble()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    // Create and attach the camera component
-    
-    // Create and attach the spring arm component
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
     SpringArmComponent->SetupAttachment(RootComponent);
     SpringArmComponent->TargetArmLength = 500.0f;
-    // SpringArmComponent->bEnableCameraLag = true;
-    // SpringArmComponent->CameraLagSpeed = 0.3f;
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
     CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APaperBubble::OnOverlapBegin);
 
-    // Create and attach the cable component
     CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("CableComponent"));
     CableComponent->SetupAttachment(RootComponent);
     CableComponent->SetVisibility(false); 
@@ -51,29 +47,48 @@ void APaperBubble::BeginPlay()
 {
     Super::BeginPlay();
 
-    // set location to (X=-342.500000,Y=142.500000,Z=-1081.786864)
     SetActorLocation(FVector(.0f, .10f, -2800.0f));
     CurrentBubbleType = BubbleType::SoapBubble;
+    
+    for (TObjectIterator<APaperFlipbookActor> It; It; ++It)
+    {
+        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        {
+            APaperFlipbookActor* OtherActor = *It;
+            if (OtherActor->Tags.Contains("TransitionFlipboard"))
+            {
+                PaperFlipbookActor = OtherActor;
+                PaperFlipbookActor->SetActorHiddenInGame(true);
+                break;
+            }
+        }
+    }
+
+    for (TObjectIterator<AActor> It; It; ++It)
+    {
+        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        {
+            AActor* OtherActor = *It;
+            if (OtherActor->Tags.Contains("Gum"))
+            {
+                OtherActor->SetActorHiddenInGame(true);
+                OtherActor->SetActorEnableCollision(false);
+            }
+        }
+    }
 }
 
 void APaperBubble::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    // Fix X-axis on camera
     FVector CameraLocation = CameraComponent->GetComponentLocation();
-    CameraLocation.X = .0f; // Set the constant X position
+    CameraLocation.X = .0f;
     CameraComponent->SetWorldLocation(CameraLocation);
 
-    // for (TObjectIterator<AHitActor> It; It; ++It)
-    // {
-    //     if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE and CurrentBubbleType == BubbleType::GumBubble)
-    //     {
-    //         AActor* OtherActor = *It;
-    //         if (OtherActor->Tags.Contains("AttachmentPoint"))
-    //             UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), FVector::Dist(GetActorLocation(), OtherActor->GetActorLocation()));
-    //     }
-    // }
+    FVector ActorLocation = GetActorLocation();
+    ActorLocation.Y = .10f;
+    SetActorLocation(ActorLocation);
 }
 
 void APaperBubble::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -102,17 +117,16 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
     float MovementValue = Value.Get<float>();
     if (MovementValue != 0.0f)
     {
-        // if (CurrentBubbleType == BubbleType::SoapBubble)
-        //     GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
-        // else
-        // {
+        if (CurrentBubbleType == BubbleType::SoapBubble)
+            GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
+        else if (CurrentBubbleType == BubbleType::GumBubble)
+        {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
             FVector End = Start + FVector(0.0f, 0.0f, 500.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
-            // paint ray
             DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
@@ -124,7 +138,7 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
                     GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, 1000.0f), false);
                 }
             }
-        // }
+        }
     }
 }
 
@@ -135,7 +149,7 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -MovementValue * 10.0f), true);
-        else
+        else if (CurrentBubbleType == BubbleType::GumBubble)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
@@ -143,7 +157,6 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
-            // paint ray
             DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
@@ -166,7 +179,7 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(MovementValue * 10.0f, 0.0f, 0.0f), true);
-        else
+        else if (CurrentBubbleType == BubbleType::GumBubble)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
@@ -174,7 +187,6 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
-            // paint ray
             DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
@@ -197,7 +209,7 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(-MovementValue * 10.0f, 0.0f, 0.0f), true);
-        else
+        else if (CurrentBubbleType == BubbleType::GumBubble)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
@@ -205,7 +217,6 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
-            // paint ray
             DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
@@ -227,13 +238,11 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
     {
         if (OtherActor->IsA(AHitActor::StaticClass()))
         {
-            // if tag == "EndLevel" then open the same level
             if (OtherActor->Tags.Contains("EndLevel"))
                 UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
             else if (OtherActor->Tags.Contains("NextLevel"))
             {
                 ChangeBehavior();
-                // Change map
             }
         }
     }
@@ -242,8 +251,40 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
 void APaperBubble::ChangeBehavior()
 {
     GetCharacterMovement()->StopMovementImmediately();
+    GetCharacterMovement()->GravityScale = .0f;
+
+    SetActorHiddenInGame(true);
+
+    FTimerHandle TimerHandle;
+    CurrentBubbleType = BubbleType::TransitionBubble;
+
+    PaperFlipbookActor->SetActorHiddenInGame(false);
+
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ChangeLevel, 3.0f, false);
+}
+
+void APaperBubble::ChangeLevel()
+{
+    for (TObjectIterator<AActor> It; It; ++It)
+    {
+        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        {
+            AActor* OtherActor = *It;
+            if (OtherActor->Tags.Contains("Air"))
+            {
+                OtherActor->SetActorHiddenInGame(true);
+                OtherActor->SetActorEnableCollision(false);
+            }
+            else if (OtherActor->Tags.Contains("Gum"))
+            {
+                OtherActor->SetActorHiddenInGame(false);
+                OtherActor->SetActorEnableCollision(true);
+            }
+        }
+    }
+
+    SetActorHiddenInGame(false);
+
     GetCharacterMovement()->GravityScale = .5f;
-    CurrentBubbleType = BubbleType::GumBubble;
-    // simulate physics
     GetCapsuleComponent()->SetSimulatePhysics(true);
 }
