@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "PaperSpriteActor.h"
 #include "HitActor.generated.h"
 
 UCLASS()
-class MYPROJECT_API AHitActor : public AActor
+class MYPROJECT_API AHitActor : public APaperSpriteActor
 {
 	GENERATED_BODY()
 	

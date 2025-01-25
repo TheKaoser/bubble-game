@@ -10,6 +10,8 @@
 #include "Components/InputComponent.h"
 #include "EnhancedInputSubsystems.h" 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HitActor.h"
+#include "Components/CapsuleComponent.h"
 
 APaperBubble::APaperBubble()
 {
@@ -18,6 +20,8 @@ APaperBubble::APaperBubble()
     // Create and attach the camera component
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
     CameraComponent->SetupAttachment(RootComponent);
+
+    GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APaperBubble::OnOverlapBegin);
 }
 
 void APaperBubble::BeginPlay()
@@ -87,5 +91,17 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
     if (MovementValue != 0.0f)
     {
         GetCharacterMovement()->AddImpulse(FVector(-MovementValue * 10.0f, 0.0f, 0.0f), true);
+    }
+}
+
+void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+    if (OtherActor && (OtherActor != this) && OtherComp)
+    {
+        if (OtherActor->IsA(AHitActor::StaticClass()))
+        {
+            // Handle collision with AHitActor
+            UE_LOG(LogTemp, Warning, TEXT("Collided with HitActor!"));
+        }
     }
 }

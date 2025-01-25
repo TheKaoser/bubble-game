@@ -24,4 +24,3 @@ void AHitActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
