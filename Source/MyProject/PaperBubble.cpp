@@ -103,10 +103,11 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
+                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                    GetCharacterMovement()->StopMovementImmediately();
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, 1000.0f), true);
                 }
             }
         }
@@ -133,10 +134,11 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -MovementValue * 10.0f), true);
+                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                    GetCharacterMovement()->StopMovementImmediately();
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -1000.0f), true);
                 }
             }
         }
@@ -163,10 +165,11 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    GetCharacterMovement()->AddImpulse(FVector(MovementValue * 10.0f, 0.0f, 0.0f), true);
+                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                    GetCharacterMovement()->StopMovementImmediately();
+                    GetCharacterMovement()->AddImpulse(FVector(1000.0f, 0.0f, 0.0f), true);
                 }
             }
         }
@@ -193,10 +196,11 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
 
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    GetCharacterMovement()->AddImpulse(FVector(-MovementValue * 10.0f, 0.0f, 0.0f), true);
+                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
+                    GetCharacterMovement()->StopMovementImmediately();
+                    GetCharacterMovement()->AddImpulse(FVector(-1000.0f, 0.0f, 0.0f), true);
                 }
             }
         }
@@ -224,8 +228,8 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
 void APaperBubble::ChangeBehavior()
 {
     GetCharacterMovement()->StopMovementImmediately();
-    GetCharacterMovement()->GravityScale = 1.0f;
+    GetCharacterMovement()->GravityScale = .5f;
     CurrentBubbleType = BubbleType::GumBubble;
     // simulate physics
-    // GetCapsuleComponent()->SetSimulatePhysics(true);
+    GetCapsuleComponent()->SetSimulatePhysics(true);
 }
