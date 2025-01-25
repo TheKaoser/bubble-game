@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HitActor.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 APaperBubble::APaperBubble()
 {
@@ -27,14 +28,14 @@ APaperBubble::APaperBubble()
 void APaperBubble::BeginPlay()
 {
     Super::BeginPlay();
+
+    // set location to (X=-342.500000,Y=142.500000,Z=-1081.786864)
+    SetActorLocation(FVector(-342.5f, 142.5f, 0));
 }
 
 void APaperBubble::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    // Example movement logic: move right continuously
-    // Move(1.0f);
 }
 
 void APaperBubble::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -100,8 +101,7 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
     {
         if (OtherActor->IsA(AHitActor::StaticClass()))
         {
-            // Handle collision with AHitActor
-            UE_LOG(LogTemp, Warning, TEXT("Collided with HitActor!"));
+            UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
         }
     }
 }
