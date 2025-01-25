@@ -7,9 +7,14 @@
 #include "InputActionValue.h"
 #include "PaperBubble.generated.h"
 
-/**
- * 
- */
+// enum with soap bubble and gum bubble
+UENUM(BlueprintType)
+enum class BubbleType : uint8
+{
+    SoapBubble,
+    GumBubble
+};
+
 UCLASS()
 class MYPROJECT_API APaperBubble : public APaperCharacter
 {
@@ -37,6 +42,8 @@ private:
     UFUNCTION()
     void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+    void AttachToObject(AActor* OtherActor);
+
 protected:
     virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -48,4 +55,17 @@ public:
     void MoveDown(const FInputActionValue& Value);
     void MoveRight(const FInputActionValue& Value);
     void MoveLeft(const FInputActionValue& Value);
+
+    UFUNCTION()
+    void ChangeBehavior();
+    
+    // current bubble type
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bubble")
+    BubbleType CurrentBubbleType;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class UPhysicsConstraintComponent* PhysicsConstraint;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class UCableComponent* CableComponent;
 };
