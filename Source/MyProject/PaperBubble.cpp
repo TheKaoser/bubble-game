@@ -15,14 +15,23 @@
 #include "Kismet/GameplayStatics.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "CableComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 APaperBubble::APaperBubble()
 {
     PrimaryActorTick.bCanEverTick = true;
 
     // Create and attach the camera component
+    
+    // Create and attach the spring arm component
+    SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+    SpringArmComponent->SetupAttachment(RootComponent);
+    SpringArmComponent->TargetArmLength = 500.0f;
+    // SpringArmComponent->bEnableCameraLag = true;
+    // SpringArmComponent->CameraLagSpeed = 0.3f;
+
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-    CameraComponent->SetupAttachment(RootComponent);
+    CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APaperBubble::OnOverlapBegin);
 
@@ -43,13 +52,18 @@ void APaperBubble::BeginPlay()
     Super::BeginPlay();
 
     // set location to (X=-342.500000,Y=142.500000,Z=-1081.786864)
-    SetActorLocation(FVector(-342.5f, 142.5f, 0));
+    SetActorLocation(FVector(.0f, .10f, -2800.0f));
     CurrentBubbleType = BubbleType::SoapBubble;
 }
 
 void APaperBubble::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    // Fix X-axis on camera
+    FVector CameraLocation = CameraComponent->GetComponentLocation();
+    CameraLocation.X = .0f; // Set the constant X position
+    CameraComponent->SetWorldLocation(CameraLocation);
 
     // for (TObjectIterator<AHitActor> It; It; ++It)
     // {
@@ -88,10 +102,10 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
     float MovementValue = Value.Get<float>();
     if (MovementValue != 0.0f)
     {
-        if (CurrentBubbleType == BubbleType::SoapBubble)
-            GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
-        else
-        {
+        // if (CurrentBubbleType == BubbleType::SoapBubble)
+        //     GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
+        // else
+        // {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
             FVector End = Start + FVector(0.0f, 0.0f, 500.0f);
@@ -107,10 +121,10 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, 1000.0f), true);
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, 1000.0f), false);
                 }
             }
-        }
+        // }
     }
 }
 
@@ -138,7 +152,7 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -1000.0f), true);
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -1000.0f), false);
                 }
             }
         }
@@ -169,7 +183,7 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(1000.0f, 0.0f, 0.0f), true);
+                    GetCharacterMovement()->AddImpulse(FVector(1000.0f, 0.0f, 0.0f), false);
                 }
             }
         }
@@ -200,7 +214,7 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(-1000.0f, 0.0f, 0.0f), true);
+                    GetCharacterMovement()->AddImpulse(FVector(-1000.0f, 0.0f, 0.0f), false);
                 }
             }
         }

@@ -36,6 +36,10 @@ private:
 	class UInputAction* MoveLeftAction;
 
     // Camera component
+    // spring arm component
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class USpringArmComponent* SpringArmComponent;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     class UCameraComponent* CameraComponent;
 
