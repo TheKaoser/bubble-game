@@ -89,6 +89,13 @@ void APaperBubble::Tick(float DeltaTime)
     FVector ActorLocation = GetActorLocation();
     ActorLocation.Y = .10f;
     SetActorLocation(ActorLocation);
+
+    // set z limit for camera location
+    if (CameraLocation.Z < -3000.0f)
+    {
+        CameraLocation.Z = -3000.0f;
+        CameraComponent->SetWorldLocation(CameraLocation);
+    }
 }
 
 void APaperBubble::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -239,13 +246,33 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
         if (OtherActor->IsA(AHitActor::StaticClass()))
         {
             if (OtherActor->Tags.Contains("EndLevel"))
-                UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+            {
+                GetCharacterMovement()->StopMovementImmediately();
+                GetCharacterMovement()->GravityScale = .0f;
+                
+                GetSprite()->SetPlaybackPositionInFrames(0, false);
+
+                GetSprite()->SetFlipbook(AirDeath);
+                GetSprite()->SetLooping(false);
+
+                // call OnBubbleDeath in blueprints
+                OnBubbleDeath();
+
+                // open level in 3 seconds
+                FTimerHandle TimerHandle;
+                GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ResetLevel, 3.0f, false);
+            }
             else if (OtherActor->Tags.Contains("NextLevel"))
             {
                 ChangeBehavior();
             }
         }
     }
+}
+
+void APaperBubble::ResetLevel()
+{
+    UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
 
 void APaperBubble::ChangeBehavior()

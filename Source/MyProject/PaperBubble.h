@@ -62,6 +62,7 @@ public:
     UFUNCTION()
     void ChangeBehavior();
     void ChangeLevel();
+    void ResetLevel();
     
     // current bubble type
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bubble")
@@ -72,4 +73,10 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     class APaperFlipbookActor* PaperFlipbookActor;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class UPaperFlipbook* AirDeath;
+
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnBubbleDeath();
 };
