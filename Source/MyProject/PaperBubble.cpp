@@ -124,10 +124,15 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
     float MovementValue = Value.Get<float>();
     if (MovementValue != 0.0f)
     {
+        UE_LOG(LogTemp, Warning, TEXT("MoveUp 0: %d"), CurrentBubbleType);
         if (CurrentBubbleType == BubbleType::SoapBubble)
+        {
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
+            // UE_LOG(LogTemp, Warning, TEXT("MoveUp 1: %f"), MovementValue);
+        }
         else if (CurrentBubbleType == BubbleType::GumBubble)
         {
+            // UE_LOG(LogTemp, Warning, TEXT("MoveUp 2: %f"), MovementValue);
             FHitResult HitResult;
             FVector Start = GetActorLocation();
             FVector End = Start + FVector(0.0f, 0.0f, 500.0f);
@@ -258,6 +263,8 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
                 // call OnBubbleDeath in blueprints
                 OnBubbleDeath();
 
+                CurrentBubbleType = BubbleType::TransitionBubble;
+
                 // open level in 3 seconds
                 FTimerHandle TimerHandle;
                 GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ResetLevel, 3.0f, false);
@@ -277,17 +284,20 @@ void APaperBubble::ResetLevel()
 
 void APaperBubble::ChangeBehavior()
 {
+    UE_LOG(LogTemp, Warning, TEXT("ChangeBehavior: %d"), CurrentBubbleType);
     GetCharacterMovement()->StopMovementImmediately();
     GetCharacterMovement()->GravityScale = .0f;
+    CurrentBubbleType = BubbleType::TransitionBubble;
 
     SetActorHiddenInGame(true);
 
     FTimerHandle TimerHandle;
-    CurrentBubbleType = BubbleType::TransitionBubble;
 
     PaperFlipbookActor->SetActorHiddenInGame(false);
+    PaperFlipbookActor->GetRenderComponent()->SetPlaybackPositionInFrames(0, false);
+    PaperFlipbookActor->GetRenderComponent()->SetLooping(false);
 
-    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ChangeLevel, 3.0f, false);
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ChangeLevel, 1.0f, false);
 }
 
 void APaperBubble::ChangeLevel()
@@ -306,6 +316,7 @@ void APaperBubble::ChangeLevel()
             {
                 OtherActor->SetActorHiddenInGame(false);
                 OtherActor->SetActorEnableCollision(true);
+                CurrentBubbleType = BubbleType::TransitionBubble;
             }
         }
     }
