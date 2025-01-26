@@ -90,7 +90,7 @@ void APaperBubble::BeginPlay()
                     OtherActor->SetActorEnableCollision(false);
                 }
                 SetActorLocation(FVector(.0f, .10f, 2000.0f));
-                GetCharacterMovement()->GravityScale = .4f;
+                GetCharacterMovement()->GravityScale = .2f;
                 GetSprite()->SetPlaybackPositionInFrames(0, false);
                 GetSprite()->SetFlipbook(GumIdle);
             }
@@ -413,5 +413,5 @@ void APaperBubble::ChangeLevel()
     GetSprite()->SetPlaybackPositionInFrames(0, false);
     GetSprite()->SetFlipbook(GumIdle);
     PaperFlipbookActor->GetRenderComponent()->SetLooping(true);
-    GetCharacterMovement()->GravityScale = .4f;
+    GetCharacterMovement()->GravityScale = .2f;
 }
