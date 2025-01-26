@@ -65,7 +65,7 @@ public:
     void ResetLevel();
     
     // current bubble type
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bubble")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bubble")
     BubbleType CurrentBubbleType;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -79,4 +79,7 @@ public:
 
     UFUNCTION(BlueprintImplementableEvent)
     void OnBubbleDeath();
+
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnLevelChange();
 };

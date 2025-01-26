@@ -315,6 +315,7 @@ void APaperBubble::ChangeBehavior()
 
 void APaperBubble::ChangeLevel()
 {
+    OnLevelChange();
     for (TObjectIterator<AActor> It; It; ++It)
     {
         if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
