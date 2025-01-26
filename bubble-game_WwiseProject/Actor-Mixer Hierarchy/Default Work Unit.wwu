@@ -1,6 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WwiseDocument Type="WorkUnit" ID="{05533EFA-6611-4398-9618-749AFF574EAD}" SchemaVersion="123">
 	<AudioObjects>
-		<WorkUnit Name="Default Work Unit" ID="{05533EFA-6611-4398-9618-749AFF574EAD}" PersistMode="Standalone"/>
+		<WorkUnit Name="Default Work Unit" ID="{05533EFA-6611-4398-9618-749AFF574EAD}" PersistMode="Standalone">
+			<ChildrenList>
+				<Folder Name="bubble" ID="{CAF800EF-F6BA-40BE-8237-BCD17FC5746D}" ShortID="982127230">
+					<ChildrenList>
+						<Sound Name="gum_dead" ID="{ED68D081-D24B-4329-89D8-51B4C57E905C}" ShortID="490134690">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{97283A74-5ECA-4A8A-BB04-20E464740123}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{B2EFB10D-F882-4293-8D96-F464BC0B34C6}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="gum_dead" ID="{BF221DDE-2C22-4F8D-BDA6-2A96FC12C022}">
+									<Language>SFX</Language>
+									<AudioFile>gum_dead.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="605219604"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="gum_dead" ID="{BF221DDE-2C22-4F8D-BDA6-2A96FC12C022}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="wind_dead" ID="{E5E91196-860C-4926-ADE2-04D857557202}" ShortID="600922601">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{97283A74-5ECA-4A8A-BB04-20E464740123}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{B2EFB10D-F882-4293-8D96-F464BC0B34C6}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="wind_dead" ID="{52A7A189-D546-4B7B-9813-EA11A92951F4}">
+									<Language>SFX</Language>
+									<AudioFile>wind_dead.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="29479198"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="wind_dead" ID="{52A7A189-D546-4B7B-9813-EA11A92951F4}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+				</Folder>
+				<Folder Name="ui" ID="{211803E7-6BA8-490B-BD8F-F3A8A1BAAAFF}" ShortID="390483578"/>
+				<Folder Name="sfx" ID="{3795E00D-7228-4F81-B390-DEECFA11D002}" ShortID="94111613">
+					<ChildrenList>
+						<Sound Name="anim_transition" ID="{3D03FE7F-2391-4DA0-8A9D-B81BCDFF792D}" ShortID="570580895">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{97283A74-5ECA-4A8A-BB04-20E464740123}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{B2EFB10D-F882-4293-8D96-F464BC0B34C6}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="anim_transition" ID="{FEC7625E-B806-4808-B4F0-9E89DC4311EE}">
+									<Language>SFX</Language>
+									<AudioFile>anim_transition.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="186220109"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="anim_transition" ID="{FEC7625E-B806-4808-B4F0-9E89DC4311EE}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+				</Folder>
+				<Folder Name="ambience" ID="{EF7E66D2-0CBA-4E6F-87FA-CBF48A0FE0E3}" ShortID="464058765">
+					<ChildrenList>
+						<RandomSequenceContainer Name="soundscape" ID="{EF8BE07E-80F5-4C94-85F9-066C124A4670}" ShortID="235107906">
+							<PropertyList>
+								<Property Name="NormalOrShuffle" Type="int16" Value="0"/>
+								<Property Name="PlayMechanismLoop" Type="bool" Value="True"/>
+								<Property Name="PlayMechanismSpecialTransitions" Type="bool" Value="True"/>
+								<Property Name="PlayMechanismSpecialTransitionsValue" Type="Real64" Value="3"/>
+								<Property Name="PlayMechanismStepOrContinuous" Type="int16" Value="0"/>
+								<Property Name="Volume" Type="Real64">
+									<ValueList>
+										<Value>-15</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{97283A74-5ECA-4A8A-BB04-20E464740123}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{B2EFB10D-F882-4293-8D96-F464BC0B34C6}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<Sound Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 2" ID="{62182D59-5E57-4148-AC81-D0A843B87191}" ShortID="473787710">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{97283A74-5ECA-4A8A-BB04-20E464740123}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{B2EFB10D-F882-4293-8D96-F464BC0B34C6}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 2" ID="{29CCD5D1-C489-4A91-88E4-23099B0D26FE}">
+											<Language>SFX</Language>
+											<AudioFile>Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 2.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="872681705"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 2" ID="{29CCD5D1-C489-4A91-88E4-23099B0D26FE}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 4" ID="{CF834E99-FE65-40C7-AE95-2460DFE69F57}" ShortID="423490891">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{97283A74-5ECA-4A8A-BB04-20E464740123}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{B2EFB10D-F882-4293-8D96-F464BC0B34C6}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 4" ID="{1E0875C0-60C9-4733-907E-CE2970C073AE}">
+											<Language>SFX</Language>
+											<AudioFile>Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 4.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="671967214"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 4" ID="{1E0875C0-60C9-4733-907E-CE2970C073AE}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 6" ID="{53EC8CF1-7702-47EB-95FC-7D84005C908F}" ShortID="221907194">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{97283A74-5ECA-4A8A-BB04-20E464740123}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{B2EFB10D-F882-4293-8D96-F464BC0B34C6}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 6" ID="{1E09ADE2-2254-413E-B704-D523A8A72CCE}">
+											<Language>SFX</Language>
+											<AudioFile>Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 6.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="1003847876"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 6" ID="{1E09ADE2-2254-413E-B704-D523A8A72CCE}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+							</ChildrenList>
+							<ObjectLists>
+								<ObjectList Name="Effects">
+									<Reference>
+										<Local>
+											<EffectSlot Name="" ID="{6970C1AE-A07F-4827-848C-9CE4074E97F0}" ShortID="256961379">
+												<ReferenceList>
+													<Reference Name="Effect" PluginName="Wwise Parametric EQ" CompanyID="0" PluginID="105" PluginType="3">
+														<ObjectRef Name="High_Pass_60Hz" ID="{F9627628-0B10-4272-BC30-D4C20423CB38}" WorkUnitID="{E8613F7D-BAD3-45CD-A3ED-505576F31277}"/>
+													</Reference>
+												</ReferenceList>
+											</EffectSlot>
+										</Local>
+									</Reference>
+								</ObjectList>
+							</ObjectLists>
+						</RandomSequenceContainer>
+					</ChildrenList>
+				</Folder>
+			</ChildrenList>
+		</WorkUnit>
 	</AudioObjects>
 </WwiseDocument>

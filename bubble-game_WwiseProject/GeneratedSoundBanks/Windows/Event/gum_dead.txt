@@ -1,0 +1,3 @@
+Event	ID	Name			Wwise Object Path	Notes
+	1904535975	gum_dead			\InGameSFX\gum_dead	
+

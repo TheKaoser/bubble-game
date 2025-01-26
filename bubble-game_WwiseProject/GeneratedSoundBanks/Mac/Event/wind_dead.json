@@ -1,0 +1,49 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Mac",
+  "BasePlatform": "Mac",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "154",
+  "SoundBanks": [
+   {
+    "Id": "2218484952",
+    "Type": "Event",
+    "GUID": "{7923F51E-2B2F-47AD-9DCD-14BBB2B22A30}",
+    "Language": "SFX",
+    "Hash": "{85BD4D16-D532-5576-B61F-94B605D31D86}",
+    "ObjectPath": "wind_dead",
+    "ShortName": "wind_dead",
+    "Path": "Event/wind_dead.bnk",
+    "Media": [
+     {
+      "Id": "29479198",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Loose",
+      "ShortName": "wind_dead.wav",
+      "Path": "Media/29479198.wem",
+      "CachePath": "B8/{B84CA865-E71C-5FFF-33ED-FE8D3F60BFB3}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "2218484952",
+      "Name": "wind_dead",
+      "ObjectPath": "\\Events\\InGameSFX\\wind_dead",
+      "GUID": "{7923F51E-2B2F-47AD-9DCD-14BBB2B22A30}",
+      "Color": "10",
+      "DurationType": "OneShot",
+      "DurationMin": "1.0003333",
+      "DurationMax": "1.0003333",
+      "MediaRefs": [
+       {
+        "Id": "29479198"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{675EE5CC-06DE-B00A-E4C2-D4405DFBC384}"
+ }
+}

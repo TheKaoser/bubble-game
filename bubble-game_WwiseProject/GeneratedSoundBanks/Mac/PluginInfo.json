@@ -4,11 +4,23 @@
   "BasePlatform": "Mac",
   "PluginLibs": [
    {
+    "LibName": "Wwise Parametric EQ",
+    "LibId": "6881283",
+    "Type": "Effect",
+    "DLL": "AkParametricEQ",
+    "StaticLib": "AkParametricEQFX"
+   },
+   {
     "LibName": "System",
     "LibId": "11403271",
     "Type": "AudioDevice"
+   },
+   {
+    "LibName": "No Output",
+    "LibId": "11862023",
+    "Type": "AudioDevice"
    }
   ],
-  "FileHash": "{1E8A8517-31F8-066C-5E8F-543B0E9E9E3A}"
+  "FileHash": "{86A72016-DCA1-22AB-72CF-61842316AEEC}"
  }
 }
