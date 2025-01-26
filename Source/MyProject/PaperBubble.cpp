@@ -47,8 +47,8 @@ void APaperBubble::BeginPlay()
 {
     Super::BeginPlay();
 
-    SetActorLocation(FVector(.0f, .10f, -2800.0f));
-    CurrentBubbleType = BubbleType::SoapBubble;
+    // CurrentBubbleType = BubbleType::SoapBubble;
+    CurrentBubbleType = BubbleType::GumBubble;
     
     for (TObjectIterator<APaperFlipbookActor> It; It; ++It)
     {
@@ -68,11 +68,26 @@ void APaperBubble::BeginPlay()
     {
         if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
         {
-            AActor* OtherActor = *It;
-            if (OtherActor->Tags.Contains("Gum"))
+            if (CurrentBubbleType == BubbleType::SoapBubble)
             {
-                OtherActor->SetActorHiddenInGame(true);
-                OtherActor->SetActorEnableCollision(false);
+                AActor* OtherActor = *It;
+                if (OtherActor->Tags.Contains("Gum"))
+                {
+                    OtherActor->SetActorHiddenInGame(true);
+                    OtherActor->SetActorEnableCollision(false);
+                }
+                SetActorLocation(FVector(.0f, .10f, -2800.0f));
+            }
+            else if (CurrentBubbleType == BubbleType::GumBubble)
+            {
+                AActor* OtherActor = *It;
+                if (OtherActor->Tags.Contains("Air"))
+                {
+                    OtherActor->SetActorHiddenInGame(true);
+                    OtherActor->SetActorEnableCollision(false);
+                }
+                SetActorLocation(FVector(.0f, .10f, 2000.0f));
+                GetCharacterMovement()->GravityScale = .5f;
             }
         }
     }
@@ -128,14 +143,12 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
         if (CurrentBubbleType == BubbleType::SoapBubble)
         {
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
-            // UE_LOG(LogTemp, Warning, TEXT("MoveUp 1: %f"), MovementValue);
         }
         else if (CurrentBubbleType == BubbleType::GumBubble)
         {
-            // UE_LOG(LogTemp, Warning, TEXT("MoveUp 2: %f"), MovementValue);
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(0.0f, 0.0f, 500.0f);
+            FVector End = Start + FVector(0.0f, 0.0f, 10000.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
@@ -165,7 +178,7 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(0.0f, 0.0f, -500.0f);
+            FVector End = Start + FVector(0.0f, 0.0f, -10000.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
@@ -195,7 +208,7 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(500.0f, 0.0f, 0.0f);
+            FVector End = Start + FVector(10000.0f, 0.0f, 0.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
@@ -225,7 +238,7 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(-500.0f, 0.0f, 0.0f);
+            FVector End = Start + FVector(-10000.0f, 0.0f, 0.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
