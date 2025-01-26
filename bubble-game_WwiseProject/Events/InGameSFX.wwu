@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{FDDDE8D4-5232-4A44-8688-C6AE04102CC7}" SchemaVersion="123">
+	<Events>
+		<WorkUnit Name="InGameSFX" ID="{FDDDE8D4-5232-4A44-8688-C6AE04102CC7}" PersistMode="Standalone">
+			<PropertyList>
+				<Property Name="Color" Type="int16" Value="10"/>
+				<Property Name="OverrideColor" Type="bool" Value="True"/>
+			</PropertyList>
+			<ChildrenList>
+				<Event Name="wind_dead" ID="{7923F51E-2B2F-47AD-9DCD-14BBB2B22A30}">
+					<ChildrenList>
+						<Action Name="" ID="{638AAF77-0C7A-4CEB-99C4-AB3FF5CB3AFA}" ShortID="239626490">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="wind_dead" ID="{E5E91196-860C-4926-ADE2-04D857557202}" WorkUnitID="{05533EFA-6611-4398-9618-749AFF574EAD}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="gum_dead" ID="{AE54C85F-FC72-4D51-A685-DF13E253DAB0}">
+					<ChildrenList>
+						<Action Name="" ID="{2AB7C058-50AB-4C6A-A2E4-2EEEE3213A46}" ShortID="115734452">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="gum_dead" ID="{ED68D081-D24B-4329-89D8-51B4C57E905C}" WorkUnitID="{05533EFA-6611-4398-9618-749AFF574EAD}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="begin_game" ID="{DC564BA6-8846-496A-8470-CD4999114164}">
+					<ChildrenList>
+						<Action Name="" ID="{38AE2BC4-2627-4170-9337-C9E804377DB9}" ShortID="54875831">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="wind" ID="{FBDB7554-9363-44F1-B8AF-86027BA41B6E}" WorkUnitID="{C48F1F3F-0529-4C1F-9DF9-E181F34E2797}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+						<Action Name="" ID="{0859A7E4-8432-4668-A76A-1679B29CC980}" ShortID="202124209">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="soundscape" ID="{EF8BE07E-80F5-4C94-85F9-066C124A4670}" WorkUnitID="{05533EFA-6611-4398-9618-749AFF574EAD}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="level_trans" ID="{AA7DA903-8478-4CDD-8DD4-66FF3FDB7B16}">
+					<ChildrenList>
+						<Action Name="" ID="{1C6781B7-316C-4695-8502-BBDE0CE15671}" ShortID="189188683">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="2"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="wind" ID="{FBDB7554-9363-44F1-B8AF-86027BA41B6E}" WorkUnitID="{C48F1F3F-0529-4C1F-9DF9-E181F34E2797}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+						<Action Name="" ID="{4C61120C-76F6-4A29-96BD-736F37E26A09}" ShortID="1070963780">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="anim_transition" ID="{3D03FE7F-2391-4DA0-8A9D-B81BCDFF792D}" WorkUnitID="{05533EFA-6611-4398-9618-749AFF574EAD}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+						<Action Name="" ID="{2C4DB1AE-8381-4117-B0C9-4FD7C0D48F82}" ShortID="107480425">
+							<PropertyList>
+								<Property Name="FadeTime" Type="Real64" Value="5"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="gum" ID="{D61EB697-212E-4C70-BF8A-A56FA294D367}" WorkUnitID="{C48F1F3F-0529-4C1F-9DF9-E181F34E2797}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
+	</Events>
+</WwiseDocument>

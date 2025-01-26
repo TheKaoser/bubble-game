@@ -1,0 +1,3 @@
+Event	ID	Name			Wwise Object Path	Notes
+	2218484952	wind_dead			\InGameSFX\wind_dead	
+

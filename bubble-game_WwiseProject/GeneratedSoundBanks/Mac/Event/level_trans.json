@@ -1,0 +1,71 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Mac",
+  "BasePlatform": "Mac",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "154",
+  "SoundBanks": [
+   {
+    "Id": "1999691038",
+    "Type": "Event",
+    "GUID": "{AA7DA903-8478-4CDD-8DD4-66FF3FDB7B16}",
+    "Language": "SFX",
+    "Hash": "{25117063-ABBF-76E3-598D-E14E804FF097}",
+    "ObjectPath": "level_trans",
+    "ShortName": "level_trans",
+    "Path": "Event/level_trans.bnk",
+    "Media": [
+     {
+      "Id": "186220109",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Loose",
+      "ShortName": "anim_transition.wav",
+      "Path": "Media/186220109.wem",
+      "CachePath": "88/{888CEE55-59C8-0985-17FE-414D4A9DE590}.wem"
+     },
+     {
+      "Id": "701984501",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Loose",
+      "ShortName": "gum ost_drums.wav",
+      "Path": "Media/701984501.wem",
+      "CachePath": "F6/{F67B5F92-B920-058D-BAB4-117096C5F849}.wem"
+     },
+     {
+      "Id": "746581177",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Loose",
+      "ShortName": "gum ost.wav",
+      "Path": "Media/746581177.wem",
+      "CachePath": "2C/{2CD6D79D-E989-D63F-11DE-C9E3954C4623}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "1999691038",
+      "Name": "level_trans",
+      "ObjectPath": "\\Events\\InGameSFX\\level_trans",
+      "GUID": "{AA7DA903-8478-4CDD-8DD4-66FF3FDB7B16}",
+      "Color": "10",
+      "DurationType": "Infinite",
+      "MediaRefs": [
+       {
+        "Id": "186220109"
+       },
+       {
+        "Id": "701984501"
+       },
+       {
+        "Id": "746581177"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{D0A1A6CF-BAC7-0E3C-979C-C04A0183922F}"
+ }
+}

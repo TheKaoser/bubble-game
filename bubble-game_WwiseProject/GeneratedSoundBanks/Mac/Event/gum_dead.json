@@ -1,0 +1,49 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Mac",
+  "BasePlatform": "Mac",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "154",
+  "SoundBanks": [
+   {
+    "Id": "1904535975",
+    "Type": "Event",
+    "GUID": "{AE54C85F-FC72-4D51-A685-DF13E253DAB0}",
+    "Language": "SFX",
+    "Hash": "{4C5C1492-BCF1-AB38-4483-9D18ADA9F0D0}",
+    "ObjectPath": "gum_dead",
+    "ShortName": "gum_dead",
+    "Path": "Event/gum_dead.bnk",
+    "Media": [
+     {
+      "Id": "605219604",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Loose",
+      "ShortName": "gum_dead.wav",
+      "Path": "Media/605219604.wem",
+      "CachePath": "7F/{7FA46AF0-EE3D-7462-8CF8-503842CE0FE3}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "1904535975",
+      "Name": "gum_dead",
+      "ObjectPath": "\\Events\\InGameSFX\\gum_dead",
+      "GUID": "{AE54C85F-FC72-4D51-A685-DF13E253DAB0}",
+      "Color": "10",
+      "DurationType": "OneShot",
+      "DurationMin": "1.0003333",
+      "DurationMax": "1.0003333",
+      "MediaRefs": [
+       {
+        "Id": "605219604"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{45AE53D9-3666-1A33-1447-73E9C557371D}"
+ }
+}

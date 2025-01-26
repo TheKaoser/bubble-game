@@ -48,6 +48,7 @@ void APaperBubble::BeginPlay()
 {
     Super::BeginPlay();
 
+    // CurrentBubbleType = BubbleType::GumBubble;
     CurrentBubbleType = BubbleType::SoapBubble;
     
     for (TObjectIterator<APaperFlipbookActor> It; It; ++It)
@@ -89,9 +90,22 @@ void APaperBubble::BeginPlay()
                     OtherActor->SetActorEnableCollision(false);
                 }
                 SetActorLocation(FVector(.0f, .10f, 2000.0f));
-                GetCharacterMovement()->GravityScale = .5f;
+                GetCharacterMovement()->GravityScale = .4f;
                 GetSprite()->SetPlaybackPositionInFrames(0, false);
                 GetSprite()->SetFlipbook(GumIdle);
+            }
+        }
+    }
+
+    for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
+    {
+        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        {
+            if (It->ComponentHasTag("EndCinematic"))
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Found StartCinematic"));
+                It->SetVisibility(false);
+                break;
             }
         }
     }
@@ -102,10 +116,6 @@ void APaperBubble::BeginPlay()
     SetActorHiddenInGame(true);
 
     FTimerHandle TimerHandle;
-
-    // PaperFlipbookActor->SetActorHiddenInGame(false);
-    // PaperFlipbookActor->GetRenderComponent()->SetPlaybackPositionInFrames(0, false);
-    // PaperFlipbookActor->GetRenderComponent()->SetLooping(false);
 
     GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::StartGame, 12.0f, false);
 }
@@ -122,7 +132,6 @@ void APaperBubble::StartGame()
         {
             if (It->ComponentHasTag("StartCinematic"))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Found StartCinematic"));
                 It->SetVisibility(false);
                 break;
             }
@@ -156,6 +165,27 @@ void APaperBubble::Tick(float DeltaTime)
         killed = true;
     }
     LastFrameZ = GetActorLocation().Z;
+
+    if (GetActorLocation().Z < -2800.0f and CurrentBubbleType == BubbleType::GumBubble)
+    {
+        GetCharacterMovement()->StopMovementImmediately();
+        GetCharacterMovement()->GravityScale = .0f;
+        CurrentBubbleType = BubbleType::TransitionBubble;
+        SetActorHiddenInGame(true);
+
+        for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
+        {
+            if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+            {
+                if (It->ComponentHasTag("EndCinematic"))
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Found StartCinematic"));
+                    It->SetVisibility(true);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void APaperBubble::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -383,5 +413,5 @@ void APaperBubble::ChangeLevel()
     GetSprite()->SetPlaybackPositionInFrames(0, false);
     GetSprite()->SetFlipbook(GumIdle);
     PaperFlipbookActor->GetRenderComponent()->SetLooping(true);
-    GetCharacterMovement()->GravityScale = .5f;
+    GetCharacterMovement()->GravityScale = .4f;
 }
