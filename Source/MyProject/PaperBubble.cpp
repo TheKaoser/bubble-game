@@ -49,7 +49,6 @@ void APaperBubble::BeginPlay()
     Super::BeginPlay();
 
     CurrentBubbleType = BubbleType::SoapBubble;
-    // CurrentBubbleType = BubbleType::GumBubble;
     
     for (TObjectIterator<APaperFlipbookActor> It; It; ++It)
     {
@@ -93,6 +92,39 @@ void APaperBubble::BeginPlay()
                 GetCharacterMovement()->GravityScale = .5f;
                 GetSprite()->SetPlaybackPositionInFrames(0, false);
                 GetSprite()->SetFlipbook(GumIdle);
+            }
+        }
+    }
+
+    GetCharacterMovement()->StopMovementImmediately();
+    GetCharacterMovement()->GravityScale = .0f;
+    CurrentBubbleType = BubbleType::TransitionBubble;
+    SetActorHiddenInGame(true);
+
+    FTimerHandle TimerHandle;
+
+    // PaperFlipbookActor->SetActorHiddenInGame(false);
+    // PaperFlipbookActor->GetRenderComponent()->SetPlaybackPositionInFrames(0, false);
+    // PaperFlipbookActor->GetRenderComponent()->SetLooping(false);
+
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::StartGame, 12.0f, false);
+}
+
+void APaperBubble::StartGame()
+{
+    CurrentBubbleType = BubbleType::SoapBubble;
+    GetCharacterMovement()->GravityScale = .1f;
+    SetActorHiddenInGame(false);
+
+    for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
+    {
+        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        {
+            if (It->ComponentHasTag("StartCinematic"))
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Found StartCinematic"));
+                It->SetVisibility(false);
+                break;
             }
         }
     }
@@ -314,7 +346,6 @@ void APaperBubble::ChangeBehavior()
     GetCharacterMovement()->StopMovementImmediately();
     GetCharacterMovement()->GravityScale = .0f;
     CurrentBubbleType = BubbleType::TransitionBubble;
-
     SetActorHiddenInGame(true);
 
     FTimerHandle TimerHandle;

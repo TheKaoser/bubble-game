@@ -58,6 +58,7 @@ public:
     void ChangeBehavior();
     void ChangeLevel();
     void ResetLevel();
+    void StartGame();
     
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bubble")
     BubbleType CurrentBubbleType;
