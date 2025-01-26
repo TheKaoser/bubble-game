@@ -31,6 +31,7 @@ APaperBubble::APaperBubble()
     CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APaperBubble::OnOverlapBegin);
+    GetCapsuleComponent()->SetUseCCD(true);
 
     CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("CableComponent"));
     CableComponent->SetupAttachment(RootComponent);
@@ -47,8 +48,8 @@ void APaperBubble::BeginPlay()
 {
     Super::BeginPlay();
 
-    // CurrentBubbleType = BubbleType::SoapBubble;
-    CurrentBubbleType = BubbleType::GumBubble;
+    CurrentBubbleType = BubbleType::SoapBubble;
+    // CurrentBubbleType = BubbleType::GumBubble;
     
     for (TObjectIterator<APaperFlipbookActor> It; It; ++It)
     {
@@ -77,6 +78,8 @@ void APaperBubble::BeginPlay()
                     OtherActor->SetActorEnableCollision(false);
                 }
                 SetActorLocation(FVector(.0f, .10f, -2800.0f));
+                GetSprite()->SetPlaybackPositionInFrames(0, false);
+                GetSprite()->SetFlipbook(AirIdle);
             }
             else if (CurrentBubbleType == BubbleType::GumBubble)
             {
@@ -88,6 +91,8 @@ void APaperBubble::BeginPlay()
                 }
                 SetActorLocation(FVector(.0f, .10f, 2000.0f));
                 GetCharacterMovement()->GravityScale = .5f;
+                GetSprite()->SetPlaybackPositionInFrames(0, false);
+                GetSprite()->SetFlipbook(GumIdle);
             }
         }
     }
@@ -105,12 +110,20 @@ void APaperBubble::Tick(float DeltaTime)
     ActorLocation.Y = .10f;
     SetActorLocation(ActorLocation);
 
-    // set z limit for camera location
     if (CameraLocation.Z < -3000.0f)
     {
         CameraLocation.Z = -3000.0f;
         CameraComponent->SetWorldLocation(CameraLocation);
     }
+
+    CurrentCoolDown -= DeltaTime;
+
+    if (FMath::IsNearlyEqual(GetActorLocation().Z, LastFrameZ, 0.01f) and GetCharacterMovement()->Velocity.Size() < 0.01f and CurrentBubbleType == BubbleType::GumBubble and not killed)
+    {
+        KillBubble();
+        killed = true;
+    }
+    LastFrameZ = GetActorLocation().Z;
 }
 
 void APaperBubble::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -139,16 +152,15 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
     float MovementValue = Value.Get<float>();
     if (MovementValue != 0.0f)
     {
-        UE_LOG(LogTemp, Warning, TEXT("MoveUp 0: %d"), CurrentBubbleType);
         if (CurrentBubbleType == BubbleType::SoapBubble)
         {
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
         }
-        else if (CurrentBubbleType == BubbleType::GumBubble)
+        else if (CurrentBubbleType == BubbleType::GumBubble and CurrentCoolDown <= 0.0f)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(0.0f, 0.0f, 10000.0f);
+            FVector End = Start + FVector(0.0f, 0.0f, 1000.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
@@ -158,9 +170,9 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
             {
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, 1000.0f), false);
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, 10000.0f), false);
+                    CurrentCoolDown = CoolDown;
                 }
             }
         }
@@ -174,11 +186,11 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -MovementValue * 10.0f), true);
-        else if (CurrentBubbleType == BubbleType::GumBubble)
+        else if (CurrentBubbleType == BubbleType::GumBubble and CurrentCoolDown <= 0.0f)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(0.0f, 0.0f, -10000.0f);
+            FVector End = Start + FVector(0.0f, 0.0f, -1000.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
@@ -188,9 +200,9 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
             {
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -1000.0f), false);
+                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -10000.0f), false);
+                    CurrentCoolDown = CoolDown;
                 }
             }
         }
@@ -204,11 +216,11 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(MovementValue * 10.0f, 0.0f, 0.0f), true);
-        else if (CurrentBubbleType == BubbleType::GumBubble)
+        else if (CurrentBubbleType == BubbleType::GumBubble and CurrentCoolDown <= 0.0f)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(10000.0f, 0.0f, 0.0f);
+            FVector End = Start + FVector(1000.0f, 0.0f, 0.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
@@ -218,9 +230,9 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
             {
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(1000.0f, 0.0f, 0.0f), false);
+                    GetCharacterMovement()->AddImpulse(FVector(10000.0f, 0.0f, 0.0f), false);
+                    CurrentCoolDown = CoolDown;
                 }
             }
         }
@@ -234,11 +246,11 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
             GetCharacterMovement()->AddImpulse(FVector(-MovementValue * 10.0f, 0.0f, 0.0f), true);
-        else if (CurrentBubbleType == BubbleType::GumBubble)
+        else if (CurrentBubbleType == BubbleType::GumBubble and CurrentCoolDown <= 0.0f)
         {
             FHitResult HitResult;
             FVector Start = GetActorLocation();
-            FVector End = Start + FVector(-10000.0f, 0.0f, 0.0f);
+            FVector End = Start + FVector(-1000.0f, 0.0f, 0.0f);
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
@@ -248,9 +260,9 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
             {
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *HitResult.GetActor()->GetName());
                     GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(-1000.0f, 0.0f, 0.0f), false);
+                    GetCharacterMovement()->AddImpulse(FVector(-10000.0f, 0.0f, 0.0f), false);
+                    CurrentCoolDown = CoolDown;
                 }
             }
         }
@@ -265,22 +277,7 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
         {
             if (OtherActor->Tags.Contains("EndLevel"))
             {
-                GetCharacterMovement()->StopMovementImmediately();
-                GetCharacterMovement()->GravityScale = .0f;
-                
-                GetSprite()->SetPlaybackPositionInFrames(0, false);
-
-                GetSprite()->SetFlipbook(AirDeath);
-                GetSprite()->SetLooping(false);
-
-                // call OnBubbleDeath in blueprints
-                OnBubbleDeath();
-
-                CurrentBubbleType = BubbleType::TransitionBubble;
-
-                // open level in 3 seconds
-                FTimerHandle TimerHandle;
-                GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ResetLevel, 3.0f, false);
+                KillBubble();
             }
             else if (OtherActor->Tags.Contains("NextLevel"))
             {
@@ -290,6 +287,23 @@ void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
     }
 }
 
+void APaperBubble::KillBubble()
+{
+    GetCharacterMovement()->StopMovementImmediately();
+    GetCharacterMovement()->GravityScale = .0f;
+    
+    GetSprite()->SetFlipbook(CurrentBubbleType == BubbleType::SoapBubble ? AirDeath : GumDeath);
+    GetSprite()->SetPlaybackPositionInFrames(0, false);
+    GetSprite()->SetLooping(false);
+
+    OnBubbleDeath();
+
+    CurrentBubbleType = BubbleType::TransitionBubble;
+
+    FTimerHandle TimerHandle;
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ResetLevel, 3.0f, false);
+}
+
 void APaperBubble::ResetLevel()
 {
     UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
@@ -297,7 +311,6 @@ void APaperBubble::ResetLevel()
 
 void APaperBubble::ChangeBehavior()
 {
-    UE_LOG(LogTemp, Warning, TEXT("ChangeBehavior: %d"), CurrentBubbleType);
     GetCharacterMovement()->StopMovementImmediately();
     GetCharacterMovement()->GravityScale = .0f;
     CurrentBubbleType = BubbleType::TransitionBubble;
@@ -330,13 +343,14 @@ void APaperBubble::ChangeLevel()
             {
                 OtherActor->SetActorHiddenInGame(false);
                 OtherActor->SetActorEnableCollision(true);
-                CurrentBubbleType = BubbleType::TransitionBubble;
             }
         }
     }
 
+    CurrentBubbleType = BubbleType::GumBubble;
     SetActorHiddenInGame(false);
-
+    GetSprite()->SetPlaybackPositionInFrames(0, false);
+    GetSprite()->SetFlipbook(GumIdle);
+    PaperFlipbookActor->GetRenderComponent()->SetLooping(true);
     GetCharacterMovement()->GravityScale = .5f;
-    GetCapsuleComponent()->SetSimulatePhysics(true);
 }

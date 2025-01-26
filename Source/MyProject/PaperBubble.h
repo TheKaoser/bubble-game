@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,7 +5,6 @@
 #include "InputActionValue.h"
 #include "PaperBubble.generated.h"
 
-// enum with soap bubble and gum bubble
 UENUM(BlueprintType)
 enum class BubbleType : uint8
 {
@@ -36,8 +33,6 @@ private:
     UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* MoveLeftAction;
 
-    // Camera component
-    // spring arm component
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     class USpringArmComponent* SpringArmComponent;
 
@@ -64,7 +59,6 @@ public:
     void ChangeLevel();
     void ResetLevel();
     
-    // current bubble type
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bubble")
     BubbleType CurrentBubbleType;
 
@@ -75,11 +69,25 @@ public:
     class APaperFlipbookActor* PaperFlipbookActor;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class UPaperFlipbook* AirIdle;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     class UPaperFlipbook* AirDeath;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class UPaperFlipbook* GumIdle;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class UPaperFlipbook* GumDeath;
 
     UFUNCTION(BlueprintImplementableEvent)
     void OnBubbleDeath();
 
+    void KillBubble();
+    bool killed = false;
+
     UFUNCTION(BlueprintImplementableEvent)
     void OnLevelChange();
+
+    float CoolDown = 1.0f;
+    float CurrentCoolDown = 0.f;
+
+    float LastFrameZ = .0f;
 };
