@@ -10,12 +10,20 @@
     "Type": "User",
     "GUID": "{701ECBBD-9C7B-4030-8CDB-749EE5D1C7B9}",
     "Language": "SFX",
-    "Hash": "{17FE0098-3A1D-FE85-274E-D2C789C102C1}",
+    "Hash": "{EDB5E426-01B6-07BD-1084-C15E52CE8750}",
     "ObjectPath": "Init",
     "ShortName": "Init",
     "Path": "Init.bnk",
     "Plugins": {
      "AudioDevices": [
+      {
+       "Id": "2317455096",
+       "Name": "No_Output",
+       "ObjectPath": "\\Audio Devices\\Default Work Unit\\No_Output",
+       "GUID": "{12FF4A09-2AA1-44CA-A4EC-FD66F9AEC8A3}",
+       "LibName": "No Output",
+       "LibId": "11862023"
+      },
       {
        "Id": "3859886410",
        "Name": "System",
@@ -36,6 +44,6 @@
     ]
    }
   ],
-  "FileHash": "{B82E0DAA-A648-8E5C-C75A-E7458784E6EB}"
+  "FileHash": "{0BC2D66B-7277-0B2E-D766-A9F84B588B74}"
  }
 }
