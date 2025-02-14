@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PaperBubble.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
@@ -18,6 +15,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbookActor.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+#include "LevelSequenceActor.h"
 
 APaperBubble::APaperBubble()
 {
@@ -25,7 +25,6 @@ APaperBubble::APaperBubble()
 
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
     SpringArmComponent->SetupAttachment(RootComponent);
-    SpringArmComponent->TargetArmLength = 500.0f;
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
     CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
@@ -35,25 +34,31 @@ APaperBubble::APaperBubble()
 
     CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("CableComponent"));
     CableComponent->SetupAttachment(RootComponent);
-    CableComponent->SetVisibility(false); 
+    CableComponent->SetHiddenInGame(true); 
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> CableMaterial(TEXT("Material'/Game/Materials/M_CableMaterial.M_CableMaterial'"));
     if (CableMaterial.Succeeded())
     {
         CableComponent->SetMaterial(0, CableMaterial.Object);
     }
     CableComponent->CableWidth = 5.0f;
+
+    static ConstructorHelpers::FObjectFinder<ULevelSequence> LevelSequence(TEXT("LevelSequence'/Game/Sequences/EndCinematic.EndCinematic'"));
+    if (LevelSequence.Succeeded())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Found EndCinematic 1111"));
+        EndAnimationSequence = LevelSequence.Object;
+    }
 }
 
 void APaperBubble::BeginPlay()
 {
     Super::BeginPlay();
 
-    // CurrentBubbleType = BubbleType::GumBubble;
     CurrentBubbleType = BubbleType::SoapBubble;
     
     for (TObjectIterator<APaperFlipbookActor> It; It; ++It)
     {
-        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
         {
             APaperFlipbookActor* OtherActor = *It;
             if (OtherActor->Tags.Contains("TransitionFlipboard"))
@@ -67,7 +72,7 @@ void APaperBubble::BeginPlay()
 
     for (TObjectIterator<AActor> It; It; ++It)
     {
-        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
         {
             if (CurrentBubbleType == BubbleType::SoapBubble)
             {
@@ -90,7 +95,7 @@ void APaperBubble::BeginPlay()
                     OtherActor->SetActorEnableCollision(false);
                 }
                 SetActorLocation(FVector(.0f, .10f, 2000.0f));
-                GetCharacterMovement()->GravityScale = .2f;
+                GetCharacterMovement()->GravityScale = .15f;
                 GetSprite()->SetPlaybackPositionInFrames(0, false);
                 GetSprite()->SetFlipbook(GumIdle);
             }
@@ -99,11 +104,10 @@ void APaperBubble::BeginPlay()
 
     for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
     {
-        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
         {
             if (It->ComponentHasTag("EndCinematic"))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Found StartCinematic"));
                 It->SetVisibility(false);
                 break;
             }
@@ -116,7 +120,6 @@ void APaperBubble::BeginPlay()
     SetActorHiddenInGame(true);
 
     FTimerHandle TimerHandle;
-
     GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::StartGame, 12.0f, false);
 }
 
@@ -128,11 +131,11 @@ void APaperBubble::StartGame()
 
     for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
     {
-        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
         {
             if (It->ComponentHasTag("StartCinematic"))
             {
-                It->SetVisibility(false);
+                It->SetHiddenInGame(true);
                 break;
             }
         }
@@ -168,23 +171,7 @@ void APaperBubble::Tick(float DeltaTime)
 
     if (GetActorLocation().Z < -2800.0f and CurrentBubbleType == BubbleType::GumBubble)
     {
-        GetCharacterMovement()->StopMovementImmediately();
-        GetCharacterMovement()->GravityScale = .0f;
-        CurrentBubbleType = BubbleType::TransitionBubble;
-        SetActorHiddenInGame(true);
-
-        for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
-        {
-            if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
-            {
-                if (It->ComponentHasTag("EndCinematic"))
-                {
-                    UE_LOG(LogTemp, Warning, TEXT("Found StartCinematic"));
-                    It->SetVisibility(true);
-                    break;
-                }
-            }
-        }
+        WinGame();
     }
 }
 
@@ -384,7 +371,7 @@ void APaperBubble::ChangeBehavior()
     PaperFlipbookActor->GetRenderComponent()->SetPlaybackPositionInFrames(0, false);
     PaperFlipbookActor->GetRenderComponent()->SetLooping(false);
 
-    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ChangeLevel, 1.0f, false);
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ChangeLevel, 1.8f, false);
 }
 
 void APaperBubble::ChangeLevel()
@@ -392,7 +379,7 @@ void APaperBubble::ChangeLevel()
     OnLevelChange();
     for (TObjectIterator<AActor> It; It; ++It)
     {
-        if (It->GetWorld() && It->GetWorld()->WorldType == EWorldType::PIE)
+        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
         {
             AActor* OtherActor = *It;
             if (OtherActor->Tags.Contains("Air"))
@@ -413,5 +400,41 @@ void APaperBubble::ChangeLevel()
     GetSprite()->SetPlaybackPositionInFrames(0, false);
     GetSprite()->SetFlipbook(GumIdle);
     PaperFlipbookActor->GetRenderComponent()->SetLooping(true);
-    GetCharacterMovement()->GravityScale = .2f;
+    GetCharacterMovement()->GravityScale = .15f;
+}
+
+void APaperBubble::WinGame()
+{
+    GetCharacterMovement()->StopMovementImmediately();
+    GetCharacterMovement()->GravityScale = .0f;
+    CurrentBubbleType = BubbleType::TransitionBubble;
+    SetActorHiddenInGame(true);
+
+    for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
+    {
+        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
+        {
+            if (It->ComponentHasTag("EndCinematic"))
+            {
+                It->SetVisibility(true);
+                break;
+            }
+        }
+    }
+    
+    ALevelSequenceActor* LevelSequenceActor;
+    ULevelSequencePlayer* LevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), EndAnimationSequence, FMovieSceneSequencePlaybackSettings(), LevelSequenceActor);
+
+    if (LevelSequencePlayer)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Playing EndCinematic"));
+        LevelSequencePlayer->Play();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Unable to create level sequence player"));
+    }
+
+    FTimerHandle TimerHandle;
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::StartGame, 12.0f, false);
 }
