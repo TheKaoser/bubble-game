@@ -60,9 +60,8 @@ public:
     void ResetLevel();
     void StartGame();
     void WinGame();
-
-    
-    
+    void HideCable();
+      
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bubble")
     BubbleType CurrentBubbleType;
 
@@ -94,7 +93,4 @@ public:
     float CurrentCoolDown = 0.f;
 
     float LastFrameZ = .0f;
-
-    UPROPERTY(EditAnywhere, Category = "Level Sequencer")
-    class ULevelSequence* EndAnimationSequence;
 };

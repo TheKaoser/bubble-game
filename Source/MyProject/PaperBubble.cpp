@@ -18,6 +18,9 @@
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "LevelSequenceActor.h"
+#include "MediaPlateComponent.h"
+#include "MediaPlayer.h"
+#include "EngineUtils.h"
 
 APaperBubble::APaperBubble()
 {
@@ -35,19 +38,13 @@ APaperBubble::APaperBubble()
     CableComponent = CreateDefaultSubobject<UCableComponent>(TEXT("CableComponent"));
     CableComponent->SetupAttachment(RootComponent);
     CableComponent->SetHiddenInGame(true); 
-    static ConstructorHelpers::FObjectFinder<UMaterialInterface> CableMaterial(TEXT("Material'/Game/Materials/M_CableMaterial.M_CableMaterial'"));
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> CableMaterial(TEXT("Material'/Game/Materials/M_CableMaterial'"));
     if (CableMaterial.Succeeded())
     {
         CableComponent->SetMaterial(0, CableMaterial.Object);
+        UE_LOG(LogTemp, Warning, TEXT("Cable material successfully applied."));
     }
     CableComponent->CableWidth = 5.0f;
-
-    static ConstructorHelpers::FObjectFinder<ULevelSequence> LevelSequence(TEXT("LevelSequence'/Game/Sequences/EndCinematic.EndCinematic'"));
-    if (LevelSequence.Succeeded())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Found EndCinematic 1111"));
-        EndAnimationSequence = LevelSequence.Object;
-    }
 }
 
 void APaperBubble::BeginPlay()
@@ -102,18 +99,6 @@ void APaperBubble::BeginPlay()
         }
     }
 
-    for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
-    {
-        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
-        {
-            if (It->ComponentHasTag("EndCinematic"))
-            {
-                It->SetVisibility(false);
-                break;
-            }
-        }
-    }
-
     GetCharacterMovement()->StopMovementImmediately();
     GetCharacterMovement()->GravityScale = .0f;
     CurrentBubbleType = BubbleType::TransitionBubble;
@@ -140,6 +125,7 @@ void APaperBubble::StartGame()
             }
         }
     }
+    // WinGame();
 }
 
 void APaperBubble::Tick(float DeltaTime)
@@ -154,9 +140,9 @@ void APaperBubble::Tick(float DeltaTime)
     ActorLocation.Y = .10f;
     SetActorLocation(ActorLocation);
 
-    if (CameraLocation.Z < -3000.0f)
+    if (CameraLocation.Z < -2800.0f)
     {
-        CameraLocation.Z = -3000.0f;
+        CameraLocation.Z = -2800.0f;
         CameraComponent->SetWorldLocation(CameraLocation);
     }
 
@@ -205,26 +191,6 @@ void APaperBubble::MoveUp(const FInputActionValue& Value)
         {
             GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, MovementValue * 10.0f), true);
         }
-        else if (CurrentBubbleType == BubbleType::GumBubble and CurrentCoolDown <= 0.0f)
-        {
-            FHitResult HitResult;
-            FVector Start = GetActorLocation();
-            FVector End = Start + FVector(0.0f, 0.0f, 1000.0f);
-            FCollisionQueryParams CollisionParams;
-            CollisionParams.AddIgnoredActor(this);
-
-            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
-
-            if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
-            {
-                if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
-                {
-                    GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, 10000.0f), false);
-                    CurrentCoolDown = CoolDown;
-                }
-            }
-        }
     }
 }
 
@@ -234,26 +200,8 @@ void APaperBubble::MoveDown(const FInputActionValue& Value)
     if (MovementValue != 0.0f)
     {
         if (CurrentBubbleType == BubbleType::SoapBubble)
-            GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -MovementValue * 10.0f), true);
-        else if (CurrentBubbleType == BubbleType::GumBubble and CurrentCoolDown <= 0.0f)
         {
-            FHitResult HitResult;
-            FVector Start = GetActorLocation();
-            FVector End = Start + FVector(0.0f, 0.0f, -1000.0f);
-            FCollisionQueryParams CollisionParams;
-            CollisionParams.AddIgnoredActor(this);
-
-            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
-
-            if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
-            {
-                if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
-                {
-                    GetCharacterMovement()->StopMovementImmediately();
-                    GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -10000.0f), false);
-                    CurrentCoolDown = CoolDown;
-                }
-            }
+            GetCharacterMovement()->AddImpulse(FVector(0.0f, 0.0f, -MovementValue * 10.0f), true);
         }
     }
 }
@@ -273,8 +221,6 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
             FCollisionQueryParams CollisionParams;
             CollisionParams.AddIgnoredActor(this);
 
-            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 1.0f);
-
             if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams))
             {
                 if (HitResult.GetActor()->Tags.Contains("AttachmentPoint"))
@@ -282,6 +228,14 @@ void APaperBubble::MoveRight(const FInputActionValue& Value)
                     GetCharacterMovement()->StopMovementImmediately();
                     GetCharacterMovement()->AddImpulse(FVector(10000.0f, 0.0f, 0.0f), false);
                     CurrentCoolDown = CoolDown;
+
+                    CableComponent->SetHiddenInGame(false);
+                    CableComponent->SetAttachEndToComponent(HitResult.GetComponent(), HitResult.BoneName);
+                    FVector LocalImpactPoint = HitResult.GetComponent()->GetComponentTransform().InverseTransformPosition(HitResult.ImpactPoint);
+                    CableComponent->EndLocation = LocalImpactPoint;
+
+                    FTimerHandle TimerHandle;
+                    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::HideCable, 1.0f, false);
                 }
             }
         }
@@ -312,10 +266,25 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
                     GetCharacterMovement()->StopMovementImmediately();
                     GetCharacterMovement()->AddImpulse(FVector(-10000.0f, 0.0f, 0.0f), false);
                     CurrentCoolDown = CoolDown;
+
+                    CableComponent->SetHiddenInGame(false);
+                    CableComponent->SetAttachEndToComponent(HitResult.GetComponent(), HitResult.BoneName);
+                    FVector LocalImpactPoint = HitResult.GetComponent()->GetComponentTransform().InverseTransformPosition(HitResult.ImpactPoint);
+                    CableComponent->EndLocation = LocalImpactPoint;
+
+                    FTimerHandle TimerHandle;
+                    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::HideCable, 0.3f, false);
                 }
             }
         }
     }
+}
+
+void APaperBubble::HideCable()
+{
+    CableComponent->SetHiddenInGame(true);
+    CableComponent->SetAttachEndTo(nullptr, NAME_None);
+    CableComponent->CableLength = 0.0f;
 }
 
 void APaperBubble::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -410,31 +379,24 @@ void APaperBubble::WinGame()
     CurrentBubbleType = BubbleType::TransitionBubble;
     SetActorHiddenInGame(true);
 
-    for (TObjectIterator<UStaticMeshComponent> It; It; ++It)
+    for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
     {
-        if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))
+        AActor* Actor = *ActorItr;
+        if (Actor->ActorHasTag("EndAnim") && (Actor->GetWorld()->WorldType == EWorldType::PIE || Actor->GetWorld()->WorldType == EWorldType::Game))
         {
-            if (It->ComponentHasTag("EndCinematic"))
+            Actor->SetActorLocation(FVector(20.0f, -60.0f, -2800.0f));
+            if (UMediaPlateComponent* MediaPlateComponent = Actor->FindComponentByClass<UMediaPlateComponent>())
             {
-                It->SetVisibility(true);
-                break;
+                if (MediaPlateComponent->GetMediaPlayer())
+                {
+                    MediaPlateComponent->Open();
+                    MediaPlateComponent->Play();
+                }
             }
+            break;
         }
-    }
-    
-    ALevelSequenceActor* LevelSequenceActor;
-    ULevelSequencePlayer* LevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), EndAnimationSequence, FMovieSceneSequencePlaybackSettings(), LevelSequenceActor);
-
-    if (LevelSequencePlayer)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Playing EndCinematic"));
-        LevelSequencePlayer->Play();
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Unable to create level sequence player"));
     }
 
     FTimerHandle TimerHandle;
-    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::StartGame, 12.0f, false);
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ResetLevel, 12.0f, false);
 }
