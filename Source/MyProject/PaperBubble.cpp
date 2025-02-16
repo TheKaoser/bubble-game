@@ -42,7 +42,6 @@ APaperBubble::APaperBubble()
     if (CableMaterial.Succeeded())
     {
         CableComponent->SetMaterial(0, CableMaterial.Object);
-        UE_LOG(LogTemp, Warning, TEXT("Cable material successfully applied."));
     }
     CableComponent->CableWidth = 5.0f;
 }
@@ -154,6 +153,11 @@ void APaperBubble::Tick(float DeltaTime)
         killed = true;
     }
     LastFrameZ = GetActorLocation().Z;
+
+    if (CurrentCoolDown <= 0)
+    {
+        CableComponent->EndLocation = GetActorLocation();
+    }
 
     if (GetActorLocation().Z < -2800.0f and CurrentBubbleType == BubbleType::GumBubble)
     {
@@ -283,7 +287,7 @@ void APaperBubble::MoveLeft(const FInputActionValue& Value)
 void APaperBubble::HideCable()
 {
     CableComponent->SetHiddenInGame(true);
-    CableComponent->SetAttachEndTo(nullptr, NAME_None);
+    CableComponent->SetAttachEndTo(this, NAME_None);
     CableComponent->CableLength = 0.0f;
 }
 
