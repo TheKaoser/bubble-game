@@ -289,7 +289,7 @@
 							<ChildrenList>
 								<MusicSegment Name="gum ost" ID="{8D60B860-017D-429E-BBFF-1D17C505E7B8}" ShortID="219438588">
 									<PropertyList>
-										<Property Name="EndPosition" Type="Real64" Value="33000"/>
+										<Property Name="EndPosition" Type="Real64" Value="33070.5128205128"/>
 									</PropertyList>
 									<ReferenceList>
 										<Reference Name="Conversion">
@@ -324,6 +324,13 @@
 														<MediaID ID="746581177"/>
 													</MediaIDList>
 												</AudioFileSource>
+												<AudioFileSource Name="gum ost_01" ID="{F1052222-9337-4486-A6A7-20439076E659}">
+													<Language>SFX</Language>
+													<AudioFile>gum ost.wav</AudioFile>
+													<MediaIDList>
+														<MediaID ID="746581177"/>
+													</MediaIDList>
+												</AudioFileSource>
 											</ChildrenList>
 											<ObjectLists>
 												<ObjectList Name="Sequences">
@@ -341,6 +348,19 @@
 																						<Property Name="FadeOutMode" Type="int16" Value="0"/>
 																					</PropertyList>
 																					<AudioSourceRef Name="gum ost" ID="{BBE66524-B635-4327-B248-FA6BC4EDB8EE}"/>
+																				</MusicClip>
+																			</Local>
+																		</Reference>
+																		<Reference>
+																			<Local>
+																				<MusicClip Name="gum ost" ID="{173BA5F8-241E-4376-8715-FDB64B585030}">
+																					<PropertyList>
+																						<Property Name="EndTrimOffset" Type="Real64" Value="33000"/>
+																						<Property Name="FadeInMode" Type="int16" Value="0"/>
+																						<Property Name="FadeOutMode" Type="int16" Value="0"/>
+																						<Property Name="PlayAt" Type="Real64" Value="70.5128205128205"/>
+																					</PropertyList>
+																					<AudioSourceRef Name="gum ost_01" ID="{F1052222-9337-4486-A6A7-20439076E659}"/>
 																				</MusicClip>
 																			</Local>
 																		</Reference>

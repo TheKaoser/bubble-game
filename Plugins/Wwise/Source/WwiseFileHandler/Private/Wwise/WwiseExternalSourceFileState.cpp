@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseExternalSourceFileState.h"
@@ -33,7 +33,7 @@ FWwiseExternalSourceFileState::FWwiseExternalSourceFileState(uint32 InMemoryAlig
 	MediaId(InMediaId),
 	PlayCount(0)
 {
-	const auto* ExternalSourceManager = IWwiseExternalSourceManager::Get();
+	const auto ExternalSourceManager = IWwiseExternalSourceManager::Get();
 	check(ExternalSourceManager);
 
 	idCodec = InCodecId;
@@ -177,7 +177,7 @@ FWwiseStreamedExternalSourceFileState::FWwiseStreamedExternalSourceFileState(uin
 
 void FWwiseStreamedExternalSourceFileState::CloseStreaming()
 {
-	auto* ExternalSourceManager = IWwiseExternalSourceManager::Get();
+	auto ExternalSourceManager = IWwiseExternalSourceManager::Get();
 	if (UNLIKELY(!ExternalSourceManager))
 	{
 		UE_LOG(LogWwiseFileHandler, Log, TEXT("FWwiseStreamedExternalSourceFileState::CloseStreaming %" PRIu32 " (%s): Closing without an ExternalSourceManager."), MediaId, *PackagedFile.PathName.ToString());

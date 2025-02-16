@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseResourceCookerImpl.h"
@@ -676,7 +676,7 @@ const FWwiseProjectDatabase* FWwiseResourceCookerImpl::GetProjectDatabase() cons
 	return FWwiseProjectDatabase::Get();
 }
 
-FWwiseResourceLoader* FWwiseResourceCookerImpl::GetResourceLoader()
+FWwiseResourceLoaderPtr FWwiseResourceCookerImpl::GetResourceLoader()
 {
 	if (auto* ProjectDatabase = GetProjectDatabase())
 	{
@@ -685,7 +685,7 @@ FWwiseResourceLoader* FWwiseResourceCookerImpl::GetResourceLoader()
 	return FWwiseResourceLoader::Get();
 }
 
-const FWwiseResourceLoader* FWwiseResourceCookerImpl::GetResourceLoader() const
+const FWwiseResourceLoaderPtr FWwiseResourceCookerImpl::GetResourceLoader() const
 {
 	if (const auto* ProjectDatabase = GetProjectDatabase())
 	{
@@ -836,7 +836,7 @@ void FWwiseResourceCookerImpl::UpdatePackagedFile(FWwisePackagedFile& OutPackage
 		UE_LOG(LogWwiseResourceCooker, Error, TEXT("UpdatePackagedFile: Could not get Project Database"));
 		return;
 	}
-	auto* ResourceLoader = GetResourceLoader();
+	FWwiseResourceLoaderPtr ResourceLoader = GetResourceLoader();
 	if (UNLIKELY(!ResourceLoader))
 	{
 		UE_LOG(LogWwiseResourceCooker, Error, TEXT("UpdatePackagedFile: Could not get Resource Loader"));
@@ -917,7 +917,7 @@ void FWwiseResourceCookerImpl::UpdatePackagedFile(FWwisePackagedFile& OutPackage
 		UE_LOG(LogWwiseResourceCooker, Error, TEXT("UpdatePackagedFile: Could not get Project Database"));
 		return;
 	}
-	auto* ResourceLoader = GetResourceLoader();
+	FWwiseResourceLoaderPtr ResourceLoader = GetResourceLoader();
 	if (UNLIKELY(!ResourceLoader))
 	{
 		UE_LOG(LogWwiseResourceCooker, Error, TEXT("UpdatePackagedFile: Could not get Resource Loader"));

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 /*=============================================================================
@@ -1608,7 +1608,7 @@ bool FAkAudioDevice::SetCurrentAudioCulture(const FString& NewAudioCulture, EAud
 		return false;
 	}
 
-	auto* ResourceLoader = FWwiseResourceLoader::Get();
+	FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 	if (UNLIKELY(!ResourceLoader))
 	{
 		UE_LOG(LogAkAudio, Warning, TEXT("FAkAudioDevice::SetCurrentAudioCulture: Could not get ResourceLoader to set Wwise language to %s. Skipping."),
@@ -2198,7 +2198,7 @@ void FAkAudioDevice::PostEventAtLocationEndOfEventCallback(AkCallbackType in_eTy
 		auto pPackage = (IAkUserEventCallbackPackage*)in_pCallbackInfo->pCookie;
 		if (pPackage && pPackage->HasExternalSources)
 		{
-			if (auto* ExternalSourceManager = IWwiseExternalSourceManager::Get())
+			if (auto ExternalSourceManager = IWwiseExternalSourceManager::Get())
 			{
 				ExternalSourceManager->OnEndOfEvent(((AkEventCallbackInfo*)in_pCallbackInfo)->playingID);
 			}
@@ -3709,8 +3709,9 @@ bool FAkAudioDevice::SetSpatialAudioListener(UAkComponent* in_pListener)
 
 	auto* SpatialAudio = IWwiseSpatialAudioAPI::Get();
 	if (UNLIKELY(!SpatialAudio)) return false;
+	if (UNLIKELY(!IsValid(m_SpatialAudioListener))) return false;
 
-	SpatialAudio->RegisterListener((AkGameObjectID)m_SpatialAudioListener);
+	SpatialAudio->RegisterListener(m_SpatialAudioListener->GetAkGameObjectID());
 	return true;
 }
 
@@ -3959,7 +3960,7 @@ bool FAkAudioDevice::EnsureInitialized()
 		TEXT(AK_WWISESDK_COPYRIGHT));
 	bLogWwiseVersionOnce = false;
 
-	auto* ResourceLoader = FWwiseResourceLoader::Get();
+	FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 	if (UNLIKELY(!ResourceLoader))
 	{
 		UE_LOG(LogAkAudio, Error, TEXT("Wwise Initialization Error: No ResourceLoader module"));
@@ -4408,7 +4409,7 @@ bool FAkAudioDevice::SetCurrentAudioCultureAsyncTask::Start()
 
 	AsyncTask(ENamedThreads::AnyNormalThreadNormalTask, [this]()
 	{
-		auto* ResourceLoader = FWwiseResourceLoader::Get();
+		FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 		if (UNLIKELY(!ResourceLoader))
 		{
 			UE_LOG(LogAkAudio, Error, TEXT("SetCurrentAudioCultureAsync: Could not get resource loader, cannot change language."));

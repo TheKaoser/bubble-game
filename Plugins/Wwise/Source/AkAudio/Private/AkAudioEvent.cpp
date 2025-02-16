@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 /*=============================================================================
@@ -534,7 +534,7 @@ AkPlayingID UAkAudioEvent::PostEvent(const AkGameObjectID GameObjectID, FCreateC
 		return AK_INVALID_PLAYING_ID;
 	}
 
-	auto* ExternalSourceManager = IWwiseExternalSourceManager::Get();
+	auto ExternalSourceManager = IWwiseExternalSourceManager::Get();
 	if (UNLIKELY(!ExternalSourceManager))
 	{
 		UE_LOG(LogAkAudio, Warning, TEXT("Failed to post AkAudioEvent '%s' without the External Source Manager."), *GetName());
@@ -721,7 +721,7 @@ void UAkAudioEvent::FillMetadata(FWwiseProjectDatabase* ProjectDatabase)
 void UAkAudioEvent::LoadEventData()
 {
 	SCOPED_AKAUDIO_EVENT_2(TEXT("LoadEventData"));
-	auto* ResourceLoader = FWwiseResourceLoader::Get();
+	FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 	if (UNLIKELY(!ResourceLoader))
 	{
 		return;
@@ -813,7 +813,7 @@ void UAkAudioEvent::UnloadEventData(bool bAsync)
 	auto PreviouslyLoadedEvent = LoadedEvent.exchange(nullptr);
 	if (PreviouslyLoadedEvent)
 	{
-		auto* ResourceLoader = FWwiseResourceLoader::Get();
+		FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 		if (UNLIKELY(!ResourceLoader))
 		{
 			return;

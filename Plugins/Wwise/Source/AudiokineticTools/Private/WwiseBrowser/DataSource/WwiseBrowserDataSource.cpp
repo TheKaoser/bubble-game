@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "WwiseBrowserDataSource.h"
@@ -174,6 +174,8 @@ EWwiseItemType::Type FWwiseTypeFilter::GetExpectedType(EWwiseTypeFilter Filter) 
 	{
 	case AcousticTexture:
 		return EWwiseItemType::AcousticTexture;
+	case AudioDeviceShareSet:
+		return EWwiseItemType::AudioDeviceShareSet;
 	case Effects:
 		return EWwiseItemType::EffectShareSet;
 	case Events:
@@ -181,7 +183,7 @@ EWwiseItemType::Type FWwiseTypeFilter::GetExpectedType(EWwiseTypeFilter Filter) 
 	case GameParameters:
 		return EWwiseItemType::GameParameter;
 	case MasterMixerHierarchy:
-		return EWwiseItemType::Bus;
+		return EWwiseItemType::AuxBus;
 	case State:
 		return EWwiseItemType::State;
 	case Switch:

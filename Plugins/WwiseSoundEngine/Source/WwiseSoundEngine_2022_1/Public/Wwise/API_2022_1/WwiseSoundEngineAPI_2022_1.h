@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -4729,6 +4729,269 @@ public:
 			AkAudioInputPluginGetFormatCallbackFunc in_pfnGetFormatCallback = nullptr, // Optional
 			AkAudioInputPluginGetGainCallbackFunc in_pfnGetGainCallback = nullptr      // Optional
 		) override;
+	};
+
+	/// Dynamic Dialogue namespace
+	class WWISESOUNDENGINE_API FDynamicDialogue : public IDynamicDialogue
+	{
+	public:
+		UE_NONCOPYABLE(FDynamicDialogue);
+		FDynamicDialogue() = default;
+
+		/// Resolve a dialogue event into an audio node ID based on the specified argument path.
+		/// \return Unique ID of audio node, or AK_INVALID_UNIQUE_ID if no audio node is defined for specified argument path
+		virtual AkUniqueID ResolveDialogueEvent(
+				AkUniqueID			in_eventID,					///< Unique ID of dialogue event
+				AkArgumentValueID*	in_aArgumentValues,			///< Argument path, as array of argument value IDs. AK_FALLBACK_ARGUMENTVALUE_ID indicates a fallback argument value
+				AkUInt32			in_uNumArguments,			///< Number of argument value IDs in in_aArgumentValues
+				AkPlayingID			in_idSequence = AK_INVALID_PLAYING_ID,	///< Optional sequence ID in which the token will be inserted (for profiling purposes)
+				AkCandidateCallbackFunc in_candidateCallbackFunc = nullptr, ///< Optional callback for candidate validation based on custom criteria
+				void* in_pCookie = nullptr						///< Callback cookie (reserved to user, passed to the callback function)
+			) override;
+
+#ifdef AK_SUPPORT_WCHAR
+		/// Resolve a dialogue event into an audio node ID based on the specified argument path.
+		/// \return Unique ID of audio node, or AK_INVALID_UNIQUE_ID if no audio node is defined for specified argument path
+		virtual AkUniqueID ResolveDialogueEvent(
+				const wchar_t*		in_pszEventName,			///< Name of dialogue event
+				const wchar_t**		in_aArgumentValueNames,		///< Argument path, as array of argument value names. L"" indicates a fallback argument value
+				AkUInt32			in_uNumArguments,			///< Number of argument value names in in_aArgumentValueNames
+				AkPlayingID			in_idSequence = AK_INVALID_PLAYING_ID,	///< Optional sequence ID in which the token will be inserted (for profiling purposes)
+				AkCandidateCallbackFunc in_candidateCallbackFunc = nullptr, ///< Optional callback for candidate validation based on custom criteria
+				void* in_pCookie = nullptr						///< Callback cookie (reserved to user, passed to the callback function)
+			) override;
+#endif //AK_SUPPORT_WCHAR
+
+		/// Resolve a dialogue event into an audio node ID based on the specified argument path.
+		/// \return Unique ID of audio node, or AK_INVALID_UNIQUE_ID if no audio node is defined for specified argument path
+		virtual AkUniqueID ResolveDialogueEvent(
+				const char*			in_pszEventName,			///< Name of dialogue event
+				const char**		in_aArgumentValueNames,		///< Argument path, as array of argument value names. "" indicates a fallback argument value
+				AkUInt32			in_uNumArguments,			///< Number of argument value names in in_aArgumentValueNames
+				AkPlayingID			in_idSequence = AK_INVALID_PLAYING_ID,	///< Optional sequence ID in which the token will be inserted (for profiling purposes)
+				AkCandidateCallbackFunc in_candidateCallbackFunc = nullptr, ///< Optional callback for candidate validation based on custom criteria
+				void* in_pCookie = nullptr						///< Callback cookie (reserved to user, passed to the callback function)
+			) override;
+
+		/// Get the value of a custom property of integer or boolean type.
+		/// \return 
+		/// - AK_Success if the value is found			
+		/// - AK_PartialSuccess if the event was found but no matching custom property was found on this object. Note that it could mean this value is the default value.
+		/// - AK_IDNotFound if the EventID is unknown (not loaded or typo in the id)
+		virtual AKRESULT GetDialogueEventCustomPropertyValue(
+			AkUniqueID in_eventID,			///< Unique ID of dialogue event
+			AkUInt32 in_uPropID,			///< Property ID of your custom property found under the Custom Properties tab of the Wwise project settings.
+			AkInt32& out_iValue				///< Property Value
+			) override;
+
+		/// Get the value of a custom property of real type.
+		/// \return 
+		/// - AK_Success if the value is found			
+		/// - AK_PartialSuccess if the event was found but no matching custom property was found on this object. Note that it could mean this value is the default value.
+		/// - AK_IDNotFound if the EventID is unknown (not loaded or typo in the id)
+		virtual AKRESULT GetDialogueEventCustomPropertyValue(
+			AkUniqueID in_eventID,			///< Unique ID of dialogue event
+			AkUInt32 in_uPropID,			///< Property ID of your custom property found under the Custom Properties tab of the Wwise project settings.
+			AkReal32& out_fValue			///< Property Value
+			) override;
+	};
+
+	/// Dynamic Sequence namespace. Use the Dynamic Sequence API to play and sequence Dialogue Events dynamically, according to a set of rules and conditions. For more information, refer to \ref integrating_elements_dynamicdialogue and <a href="https://www.audiokinetic.com/library/edge/?source=Help&id=understanding_dynamic_dialogue_system" target="_blank">Understanding the Dynamic Dialogue System</a>.
+	class WWISESOUNDENGINE_API FDynamicSequence : public IDynamicSequence 
+	{
+	public:
+		UE_NONCOPYABLE(FDynamicSequence);
+		FDynamicSequence() = default;
+
+		class WWISESOUNDENGINE_API FPlaylist : public IPlaylist 
+		{
+		public:
+			UE_NONCOPYABLE(FPlaylist);
+			FPlaylist(AkPlayingID PlayingID, AK::SoundEngine::DynamicSequence::Playlist& Playlist) :
+				PlayingID(PlayingID),
+				Playlist(Playlist)
+			{}
+
+			/// Enqueue an Audio Node.
+			/// \return AK_Success if successful, AK_Fail otherwise
+			virtual void Enqueue(
+					AkUniqueID in_audioNodeID,							///< Unique ID of Audio Node
+					AkTimeMs in_msDelay = 0,							///< Delay before playing this item, in milliseconds
+					void * in_pCustomInfo = nullptr,					///< Optional user data
+					AkUInt32 in_cExternals = 0,							///< Optional count of external source structures
+					AkExternalSourceInfo *in_pExternalSources = nullptr	///< Optional array of external source resolution information
+					) override;
+
+			/// Removes all PlaylistItem in the array
+			virtual void RemoveAll(int Reserve = 0) override;
+
+			/// Insert a PlaylistItem at the specified position without filling it.
+			/// Returns the pointer to the PlaylistItem to be filled.
+			virtual AK::SoundEngine::DynamicSequence::PlaylistItem* Insert(unsigned int in_uIndex) override;
+
+			/// Erase the PlaylistItem at the specified index
+			virtual void Erase(unsigned int in_uIndex) override;
+
+			/// Operator [], return a reference to the specified index.
+			virtual AK::SoundEngine::DynamicSequence::PlaylistItem& operator[](unsigned int uiIndex) const override;
+
+			/// Returns true if the number of PlaylistItem in the array is 0, false otherwise.
+			virtual bool IsEmpty() const override;
+
+			/// Returns the numbers of PlaylistItem in the array.
+			virtual uint32 Length() const override;
+
+			/// Returns the playing ID for this playlist.
+			virtual AkPlayingID GetPlayingID() const override { return PlayingID; }
+
+			/// Returns the playlist.
+			virtual AK::SoundEngine::DynamicSequence::Playlist& GetPlaylist() override { return Playlist; }
+
+			/// Returns the playlist.
+			virtual const AK::SoundEngine::DynamicSequence::Playlist& GetPlaylist() const override { return Playlist; }
+
+		protected:
+			AkPlayingID PlayingID;						///< AkPlayingID returned by DynamicSequence::Open
+			AK::SoundEngine::DynamicSequence::Playlist& Playlist;
+		};
+		
+		/// Open a new Dynamic Sequence.
+		/// \return Playing ID of the dynamic sequence, or AK_INVALID_PLAYING_ID in failure case and an error message in the debug console and Wwise Profiler
+		///
+		/// \sa
+		/// - AK::SoundEngine::DynamicSequence::DynamicSequenceType
+		virtual AkPlayingID Open(
+			AkGameObjectID		in_gameObjectID,			///< Associated game object ID
+			AkUInt32			in_uFlags	   = 0,			///< Bitmask: see \ref AkCallbackType
+			AkCallbackFunc		in_pfnCallback = nullptr,		///< Callback function
+			void* 				in_pCookie	   = nullptr,		///< Callback cookie that will be sent to the callback function along with additional information;
+			AK::SoundEngine::DynamicSequence::DynamicSequenceType in_eDynamicSequenceType = AK::SoundEngine::DynamicSequence::DynamicSequenceType_SampleAccurate ///< See : \ref AK::SoundEngine::DynamicSequence::DynamicSequenceType
+			) override;
+													
+		/// Close specified Dynamic Sequence. The Dynamic Sequence will play until finished and then
+		/// deallocate itself.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Close(
+			AkPlayingID in_playingID						///< AkPlayingID returned by DynamicSequence::Open
+			) override;
+
+		/// Play specified Dynamic Sequence.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Play( 
+			AkPlayingID in_playingID,											///< AkPlayingID returned by DynamicSequence::Open
+			AkTimeMs in_uTransitionDuration = 0,								///< Fade duration
+			AkCurveInterpolation in_eFadeCurve = AkCurveInterpolation_Linear	///< Curve type to be used for the transition
+			) override;
+
+		/// Pause specified Dynamic Sequence. 
+		/// To restart the sequence, call Resume.  The item paused will resume its playback, followed by the rest of the sequence.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Pause( 
+			AkPlayingID in_playingID,											///< AkPlayingID returned by DynamicSequence::Open
+			AkTimeMs in_uTransitionDuration = 0,								///< Fade duration
+			AkCurveInterpolation in_eFadeCurve = AkCurveInterpolation_Linear	///< Curve type to be used for the transition
+			) override;
+
+		/// Resume specified Dynamic Sequence.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Resume(
+			AkPlayingID in_playingID,											///< AkPlayingID returned by DynamicSequence::Open
+			AkTimeMs in_uTransitionDuration = 0,									///< Fade duration
+			AkCurveInterpolation in_eFadeCurve = AkCurveInterpolation_Linear	///< Curve type to be used for the transition
+			) override;
+
+		/// Stop specified Dynamic Sequence immediately.  
+		/// To restart the sequence, call Play. The sequence will restart with the item that was in the 
+		/// playlist after the item that was stopped.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Stop(
+			AkPlayingID in_playingID,											///< AkPlayingID returned by DynamicSequence::Open
+			AkTimeMs in_uTransitionDuration = 0,								///< Fade duration
+			AkCurveInterpolation in_eFadeCurve = AkCurveInterpolation_Linear	///< Curve type to be used for the transition
+			) override;
+
+		/// Break specified Dynamic Sequence.  The sequence will stop after the current item.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Break(
+			AkPlayingID in_playingID						///< AkPlayingID returned by DynamicSequence::Open
+			) override;
+
+		/// Seek inside specified Dynamic Sequence.
+		/// It is only possible to seek in the first item of the sequence.
+		/// If you seek past the duration of the first item, it will be skipped and an error will reported in the Capture Log and debug output. 
+		/// All the other items in the sequence will continue to play normally.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Seek(
+			AkPlayingID in_playingID,						///< AkPlayingID returned by DynamicSequence::Open
+			AkTimeMs in_iPosition,							///< Position into the the sound, in milliseconds
+			bool in_bSeekToNearestMarker					///< Snap to the marker nearest to the seek position.
+			) override;
+
+		/// Seek inside specified Dynamic Sequence.
+		/// It is only possible to seek in the first item of the sequence.
+		/// If you seek past the duration of the first item, it will be skipped and an error will reported in the Capture Log and debug output.
+		/// All the other items in the sequence will continue to play normally.
+		/// \return 
+		/// - AK_Success if the command was successfully queued
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT Seek(
+			AkPlayingID in_playingID,						///< AkPlayingID returned by DynamicSequence::Open
+			AkReal32 in_fPercent,							///< Position into the the sound, in percentage of the whole duration.
+			bool in_bSeekToNearestMarker					///< Snap to the marker nearest to the seek position.
+			) override;
+
+		/// Get pause times.
+		/// \return 
+		/// - AK_Success if successful
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT GetPauseTimes(
+			AkPlayingID in_playingID,						///< AkPlayingID returned by DynamicSequence::Open
+			AkUInt32 &out_uTime,							///< If sequence is currently paused, returns time when pause started, else 0.
+			AkUInt32 &out_uDuration							///< Returns total pause duration since last call to GetPauseTimes, excluding the time elapsed in the current pause.
+			) override;
+
+		/// Get currently playing item. Note that this may be different from the currently heard item
+		/// when sequence is in sample-accurate mode.
+		/// \return 
+		/// - AK_Success if successful
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		virtual AKRESULT GetPlayingItem(
+			AkPlayingID in_playingID,						///< AkPlayingID returned by DynamicSequence::Open
+			AkUniqueID & out_audioNodeID, 					///< Returned audio node ID of playing item.
+			void *& out_pCustomInfo							///< Returned user data of playing item.
+			) override;
+
+		/// Lock the Playlist for editing. Needs a corresponding UnlockPlaylist call.
+		/// \return Pointer to locked Playlist if successful, NULL otherwise (in_playingID not found)
+		/// \sa
+		/// - AK::SoundEngine::DynamicSequence::UnlockPlaylist
+		virtual IPlaylist* LockPlaylist(
+			AkPlayingID in_playingID						///< AkPlayingID returned by DynamicSequence::Open
+			) override;
+
+		/// Unlock the playlist.
+		/// \return 
+		/// - AK_Success if successful
+		/// - AK_PlayingIDNotFound if the playing ID does not match to any open Dynamic Sequence
+		/// \sa
+		/// - AK::SoundEngine::DynamicSequence::LockPlaylist
+		virtual AKRESULT UnlockPlaylist(
+			IPlaylist* in_Playlist						///< Playlist returned by LockPlaylist
+			) override;
 	};
 
 #if WITH_EDITORONLY_DATA

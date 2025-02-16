@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/API_Null/WwiseSoundEngineAPI_Null.h"
@@ -21,7 +21,7 @@ Copyright (c) 2024 Audiokinetic Inc.
 #include "AkInclude.h"
 
 FWwiseSoundEngineAPI_Null::FWwiseSoundEngineAPI_Null():
-	IWwiseSoundEngineAPI(new FQuery, new FAudioInputPlugin)
+	IWwiseSoundEngineAPI(new FQuery, new FAudioInputPlugin, new FDynamicDialogue, new FDynamicSequence)
 {}
 
 bool FWwiseSoundEngineAPI_Null::IsInitialized()
@@ -2100,6 +2100,212 @@ void FWwiseSoundEngineAPI_Null::FAudioInputPlugin::SetAudioInputCallbacks(
 {
 }
 
+AkUniqueID FWwiseSoundEngineAPI_Null::FDynamicDialogue::ResolveDialogueEvent(
+		AkUniqueID			in_eventID,
+		AkArgumentValueID*	in_aArgumentValues,
+		AkUInt32			in_uNumArguments,
+		AkPlayingID			in_idSequence,
+		AkCandidateCallbackFunc in_candidateCallbackFunc,
+		void* in_pCookie
+	)
+{
+	return AK_INVALID_PLAYING_ID;
+}
+
+#ifdef AK_SUPPORT_WCHAR
+AkUniqueID FWwiseSoundEngineAPI_Null::FDynamicDialogue::ResolveDialogueEvent(
+		const wchar_t*		in_pszEventName,
+		const wchar_t**		in_aArgumentValueNames,
+		AkUInt32			in_uNumArguments,
+		AkPlayingID			in_idSequence,
+		AkCandidateCallbackFunc in_candidateCallbackFunc,
+		void* in_pCookie
+	)
+{
+	return AK_INVALID_PLAYING_ID;
+}
+#endif //AK_SUPPORT_WCHAR
+
+AkUniqueID FWwiseSoundEngineAPI_Null::FDynamicDialogue::ResolveDialogueEvent(
+		const char*			in_pszEventName,
+		const char**		in_aArgumentValueNames,
+		AkUInt32			in_uNumArguments,
+		AkPlayingID			in_idSequence,
+		AkCandidateCallbackFunc in_candidateCallbackFunc,
+		void* in_pCookie
+	)
+{
+	return AK_INVALID_PLAYING_ID;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicDialogue::GetDialogueEventCustomPropertyValue(
+	AkUniqueID in_eventID,
+	AkUInt32 in_uPropID,
+	AkInt32& out_iValue
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicDialogue::GetDialogueEventCustomPropertyValue(
+	AkUniqueID in_eventID,
+	AkUInt32 in_uPropID,
+	AkReal32& out_fValue
+	)
+{
+	return AK_NotImplemented;
+}
+
+void FWwiseSoundEngineAPI_Null::FDynamicSequence::FPlaylist::Enqueue(
+		AkUniqueID in_audioNodeID,
+		AkTimeMs in_msDelay,
+		void * in_pCustomInfo,
+		AkUInt32 in_cExternals,
+		AkExternalSourceInfo *in_pExternalSources
+		)
+{
+}
+
+void FWwiseSoundEngineAPI_Null::FDynamicSequence::FPlaylist::RemoveAll(int Reserve)
+{
+}
+
+AK::SoundEngine::DynamicSequence::PlaylistItem* FWwiseSoundEngineAPI_Null::FDynamicSequence::FPlaylist::Insert(unsigned int in_uIndex)
+{
+	return nullptr;
+}
+
+void FWwiseSoundEngineAPI_Null::FDynamicSequence::FPlaylist::Erase(unsigned int in_uIndex)
+{
+}
+
+AK::SoundEngine::DynamicSequence::PlaylistItem& FWwiseSoundEngineAPI_Null::FDynamicSequence::FPlaylist::operator[](unsigned int uiIndex) const
+{
+	check(false);
+	static AK::SoundEngine::DynamicSequence::PlaylistItem Empty;
+	return Empty;
+}
+
+bool FWwiseSoundEngineAPI_Null::FDynamicSequence::FPlaylist::IsEmpty() const
+{
+	return true;
+}
+
+uint32 FWwiseSoundEngineAPI_Null::FDynamicSequence::FPlaylist::Length() const
+{
+	return 0;
+}
+
+AkPlayingID FWwiseSoundEngineAPI_Null::FDynamicSequence::Open(
+	AkGameObjectID		in_gameObjectID,
+	AkUInt32			in_uFlags,
+	AkCallbackFunc		in_pfnCallback,
+	void* 				in_pCookie,
+	AK::SoundEngine::DynamicSequence::DynamicSequenceType in_eDynamicSequenceType
+	)
+{
+	return AK_INVALID_PLAYING_ID;
+}
+											
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Close(
+	AkPlayingID in_playingID
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Play( 
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Pause( 
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Resume(
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Stop(
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Break(
+	AkPlayingID in_playingID
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Seek(
+	AkPlayingID in_playingID,
+	AkTimeMs in_iPosition,
+	bool in_bSeekToNearestMarker
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::Seek(
+	AkPlayingID in_playingID,
+	AkReal32 in_fPercent,
+	bool in_bSeekToNearestMarker
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::GetPauseTimes(
+	AkPlayingID in_playingID,
+	AkUInt32 &out_uTime,
+	AkUInt32 &out_uDuration
+	)
+{
+	return AK_NotImplemented;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::GetPlayingItem(
+	AkPlayingID in_playingID,
+	AkUniqueID & out_audioNodeID,
+	void *& out_pCustomInfo
+	)
+{
+	return AK_NotImplemented;
+}
+
+FWwiseSoundEngineAPI_Null::FDynamicSequence::IPlaylist* FWwiseSoundEngineAPI_Null::FDynamicSequence::LockPlaylist(
+	AkPlayingID in_playingID
+	)
+{
+	return nullptr;
+}
+
+AKRESULT FWwiseSoundEngineAPI_Null::FDynamicSequence::UnlockPlaylist(
+	IPlaylist* in_Playlist
+	)
+{
+	return AK_NotImplemented;
+}
 
 #if WITH_EDITORONLY_DATA
 FWwiseSoundEngineAPI_Null::FErrorTranslator::FErrorTranslator(FGetInfoErrorMessageTranslatorFunction InMessageTranslatorFunction) :

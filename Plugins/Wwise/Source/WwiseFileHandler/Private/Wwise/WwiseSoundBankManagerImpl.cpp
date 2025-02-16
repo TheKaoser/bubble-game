@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseSoundBankManagerImpl.h"
@@ -32,10 +32,17 @@ FWwiseSoundBankManagerImpl::~FWwiseSoundBankManagerImpl()
 void FWwiseSoundBankManagerImpl::LoadSoundBank(const FWwiseSoundBankCookedData& InSoundBankCookedData, FLoadSoundBankCallback&& InCallback)
 {
 	SCOPED_WWISEFILEHANDLER_EVENT_4(TEXT("FWwiseSoundBankManagerImpl::LoadSoundBank"));
-	IncrementFileStateUseAsync(InSoundBankCookedData.SoundBankId, EWwiseFileStateOperationOrigin::Loading, [this, InSoundBankCookedData]() mutable
+	IncrementFileStateUseAsync(InSoundBankCookedData.SoundBankId, EWwiseFileStateOperationOrigin::Loading, [WeakThis=AsWeak(), InSoundBankCookedData]() mutable
 	{
 		LLM_SCOPE_BYTAG(Audio_Wwise_FileHandler_SoundBanks);
-		return CreateOp(InSoundBankCookedData);
+		auto SharedSoundBankManager = StaticCastSharedPtr<FWwiseSoundBankManagerImpl>(WeakThis.Pin());
+		if (!SharedSoundBankManager.IsValid())
+		{
+			UE_LOG(LogWwiseFileHandler, Error,
+			       TEXT("FWwiseSoundBankManagerImpl::LoadSoundBank : Failed to get Mock SoundBankManager"))
+			return FWwiseFileStateSharedPtr(nullptr);
+		}
+		return SharedSoundBankManager->CreateOp(InSoundBankCookedData);
 	}, [InCallback = MoveTemp(InCallback)](const FWwiseFileStateSharedPtr, bool bInResult)
 	{
 		InCallback(bInResult);

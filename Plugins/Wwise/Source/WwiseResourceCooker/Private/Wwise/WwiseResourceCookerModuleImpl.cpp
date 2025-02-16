@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseResourceCookerModuleImpl.h"
@@ -120,7 +120,7 @@ IWwiseResourceCooker* FWwiseResourceCookerModule::CreateCookerForPlatform(const 
 		return nullptr;
 	}
 
-	const auto* DefaultResourceLoader = DefaultProjectDatabase->GetResourceLoader();
+	const FWwiseResourceLoaderPtr DefaultResourceLoader = DefaultProjectDatabase->GetResourceLoader();
 	if (UNLIKELY(!DefaultResourceLoader))
 	{
 		UE_LOG(LogWwiseResourceCooker, Warning, TEXT("CreateCookerForPlatform: No ResourceLoader available creating platform %s (UE: %s, Wwise: %s)"),
@@ -135,7 +135,7 @@ IWwiseResourceCooker* FWwiseResourceCookerModule::CreateCookerForPlatform(const 
 		TargetPlatform ? *TargetPlatform->IniPlatformName() : TEXT("[nullptr]"),
 		*InPlatform.GetPlatformName().ToString());
 
-	auto* NewResourceLoader = FWwiseResourceLoader::Instantiate(*DefaultResourceLoader, InPlatform);
+	FWwiseResourceLoaderPtr NewResourceLoader = FWwiseResourceLoader::Instantiate(*DefaultResourceLoader, InPlatform);
 	if (UNLIKELY(!NewResourceLoader))
 	{
 		UE_LOG(LogWwiseResourceCooker, Error, TEXT("CreateCookerForPlatform: Could not instantiate ResourceLoader creating platform %s (UE: %s, Wwise: %s)"),
@@ -152,7 +152,7 @@ IWwiseResourceCooker* FWwiseResourceCookerModule::CreateCookerForPlatform(const 
 			TargetPlatform ? *TargetPlatform->PlatformName() : TEXT("[nullptr]"),
 			TargetPlatform ? *TargetPlatform->IniPlatformName() : TEXT("[nullptr]"),
 			*InPlatform.GetPlatformName().ToString());
-		delete NewResourceLoader;
+		NewResourceLoader.Reset();
 		return nullptr;
 	}
 	NewProjectDatabase->PrepareProjectDatabaseForPlatform(MoveTemp(NewResourceLoader));

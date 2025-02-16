@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/Packaging/WwiseAssetLibrary.h"
@@ -142,7 +142,7 @@ void UWwiseAssetLibrary::LoadData()
 {
 #if !WITH_EDITORONLY_DATA
 	SCOPED_WWISEPACKAGING_EVENT_2(TEXT("UWwiseAssetLibrary::LoadData"));
-	auto* ResourceLoader = FWwiseResourceLoader::Get();
+	FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 	if (UNLIKELY(!ResourceLoader))
 	{
 		return;
@@ -166,7 +166,7 @@ void UWwiseAssetLibrary::UnloadData([[maybe_unused]] bool bAsync)
 	auto PreviouslyLoadedAssetLibrary = LoadedAssetLibrary.exchange(nullptr);
 	if (PreviouslyLoadedAssetLibrary)
 	{
-		auto* ResourceLoader = FWwiseResourceLoader::Get();
+		FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 		if (UNLIKELY(!ResourceLoader))
 		{
 			return;

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseExternalSourceManagerImpl.h"
@@ -76,10 +76,18 @@ void FWwiseExternalSourceManagerImpl::LoadExternalSource(
 	const FWwiseLanguageCookedData& InLanguage, FLoadExternalSourceCallback&& InCallback)
 {
 	SCOPED_WWISEFILEHANDLER_EVENT_4(TEXT("FWwiseExternalSourceManagerImpl::LoadExternalSource"));
-	FileHandlerExecutionQueue.Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseExternalSourceManagerImpl::LoadExternalSource"), [this, InExternalSourceCookedData, InLanguage, InCallback = MoveTemp(InCallback)]() mutable
+	FileHandlerExecutionQueue->Async(WWISEFILEHANDLER_ASYNC_NAME
+	("FWwiseExternalSourceManagerImpl::LoadExternalSource"), [WeakThis=AsWeak(), InExternalSourceCookedData, InLanguage, InCallback
+	 = MoveTemp(InCallback)]() mutable
 	{
 		LLM_SCOPE_BYTAG(Audio_Wwise_FileHandler_ExternalSources);
-		LoadExternalSourceImpl(InExternalSourceCookedData, InLanguage, MoveTemp(InCallback));
+		auto SharedExternalSourceManager = StaticCastSharedPtr<FWwiseExternalSourceManagerImpl>(WeakThis.Pin());
+		if (!SharedExternalSourceManager.IsValid())
+		{
+			UE_LOG(LogWwiseFileHandler, Error,
+			       TEXT("FWwiseExternalSourceManagerImpl::LoadExternalSource: Failed to get ExternalSourceManager"))
+		}
+		SharedExternalSourceManager->LoadExternalSourceImpl(InExternalSourceCookedData, InLanguage, MoveTemp(InCallback));
 	});
 }
 
@@ -88,9 +96,16 @@ void FWwiseExternalSourceManagerImpl::UnloadExternalSource(
 	const FWwiseLanguageCookedData& InLanguage, FUnloadExternalSourceCallback&& InCallback)
 {
 	SCOPED_WWISEFILEHANDLER_EVENT_4(TEXT("FWwiseExternalSourceManagerImpl::UnloadExternalSource"));
-	FileHandlerExecutionQueue.Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseExternalSourceManagerImpl::UnloadExternalSource"), [this, InExternalSourceCookedData, InLanguage, InCallback = MoveTemp(InCallback)]() mutable
+	FileHandlerExecutionQueue->Async(WWISEFILEHANDLER_ASYNC_NAME
+	("FWwiseExternalSourceManagerImpl::UnloadExternalSource"), [WeakThis=AsWeak(), InExternalSourceCookedData, InLanguage, InCallback = MoveTemp(InCallback)]() mutable
 	{
-		UnloadExternalSourceImpl(InExternalSourceCookedData, InLanguage, MoveTemp(InCallback));
+		auto SharedExternalSourceManager = StaticCastSharedPtr<FWwiseExternalSourceManagerImpl>(WeakThis.Pin());
+		if (!SharedExternalSourceManager.IsValid())
+		{
+			UE_LOG(LogWwiseFileHandler, Error,
+			       TEXT("FWwiseExternalSourceManagerImpl::UnloadExternalSource: Failed to get ExternalSourceManager"))
+		}
+		SharedExternalSourceManager->UnloadExternalSourceImpl(InExternalSourceCookedData, InLanguage, MoveTemp(InCallback));
 	});
 }
 
@@ -305,12 +320,19 @@ void FWwiseExternalSourceManagerImpl::BindPlayingIdToExternalSources(const uint3
 				continue;
 			}
 
-			FileHandlerExecutionQueue.Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseExternalSourceManagerImpl::BindPlayingIdToExternalSources decrement"), [this, MediaId, ExternalSourceFileState]() mutable
+			FileHandlerExecutionQueue->Async(WWISEFILEHANDLER_ASYNC_NAME
+			("FWwiseExternalSourceManagerImpl::BindPlayingIdToExternalSources decrement"), [WeakThis=AsWeak(), MediaId, ExternalSourceFileState]() mutable
 			{
 				// This type is safe as long as we don't decrement its usage
 				if (ExternalSourceFileState->DecrementPlayCount() && ExternalSourceFileState->CanDelete())
 				{
-					OnDeleteState(MediaId, *ExternalSourceFileState, EWwiseFileStateOperationOrigin::Loading, []{});
+					auto SharedExternalSourceManager = StaticCastSharedPtr<FWwiseExternalSourceManagerImpl>(WeakThis.Pin());
+					if (!SharedExternalSourceManager.IsValid())
+					{
+						UE_LOG(LogWwiseFileHandler, Error,
+							   TEXT("FWwiseExternalSourceManagerImpl::BindPlayingIdToExternalSources decrement: Failed to get ExternalSourceManager"))
+					}
+					SharedExternalSourceManager->OnDeleteState(MediaId, *ExternalSourceFileState, EWwiseFileStateOperationOrigin::Loading, []{});
 				}
 			});
 		}
@@ -366,12 +388,18 @@ void FWwiseExternalSourceManagerImpl::OnEndOfEvent(const uint32 InPlayingId)
 			UE_LOG(LogWwiseFileHandler, Error, TEXT("OnEndOfEvent: Getting external source media %" PRIu32 ": Could not cast to ExternalSourceState"), MediaId);
 			continue;
 		}
-		FileHandlerExecutionQueue.Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseExternalSourceManagerImpl::OnEndOfEvent decrement"), [this, MediaId, ExternalSourceFileState]() mutable
+		FileHandlerExecutionQueue->Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseExternalSourceManagerImpl::OnEndOfEvent decrement"), [WeakThis=AsWeak(), MediaId, ExternalSourceFileState]() mutable
 		{
+			auto SharedExternalSourceManager = StaticCastSharedPtr<FWwiseExternalSourceManagerImpl>(WeakThis.Pin());
+			if (!SharedExternalSourceManager.IsValid())
+			{
+				UE_LOG(LogWwiseFileHandler, Error,
+				       TEXT("FWwiseExternalSourceManagerImpl::OnEndOfEvent: Failed to get ExternalSourceManager"))
+			}
 			// This type is safe as long as we don't decrement its usage
 			if (ExternalSourceFileState->DecrementPlayCount() && ExternalSourceFileState->CanDelete())
 			{
-				OnDeleteState(MediaId, *ExternalSourceFileState, EWwiseFileStateOperationOrigin::Loading, []{});
+				SharedExternalSourceManager->OnDeleteState(MediaId, *ExternalSourceFileState, EWwiseFileStateOperationOrigin::Loading, []{});
 			}
 		});
 	}

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -211,9 +211,9 @@ public:
 	virtual void UpdateDataStructure(
 		const WwiseDBGuid* InBasePlatformGuid = &BasePlatformGuid) {}
 
-	virtual void PrepareProjectDatabaseForPlatform(FWwiseResourceLoader*&& InResourceLoader) {}
-	virtual FWwiseResourceLoader* GetResourceLoader() { return nullptr; }
-	virtual const FWwiseResourceLoader* GetResourceLoader() const { return nullptr; }
+	virtual void PrepareProjectDatabaseForPlatform(FWwiseResourceLoaderPtr&& InResourceLoader) {}
+	virtual FWwiseResourceLoaderPtr GetResourceLoader() { return nullptr; }
+	virtual const FWwiseResourceLoaderPtr GetResourceLoader() const { return nullptr; }
 
 	FWwiseSharedLanguageId GetCurrentLanguage() const;
 	FWwiseSharedPlatformId GetCurrentPlatform() const;
@@ -245,7 +245,7 @@ protected:
 	template <typename RequiredRef>
 	bool GetRef(RequiredRef& OutRef, const FWwiseObjectInfo& InInfo)
 	{
-		const auto* ResourceLoader = GetResourceLoader();
+		const FWwiseResourceLoaderPtr ResourceLoader = GetResourceLoader();
 		check(ResourceLoader);
 		const auto& PlatformRef = ResourceLoader->GetCurrentPlatform();
 

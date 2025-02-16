@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -23,6 +23,7 @@ class WwiseRefSoundBank;
 class WwiseAnyRef;
 class FWwiseProjectDatabase;
 struct FWwiseAssetLibraryInfo;
+struct FWwiseAssetLibraryRef;
 struct FWwiseAssetLibraryFilteringSharedData;
 
 class WWISEPACKAGINGEDITOR_API FWwiseAssetLibraryProcessor
@@ -50,6 +51,8 @@ public:
 	
 	virtual void FilterLibraryAssets(FWwiseAssetLibraryFilteringSharedData& Shared, FWwiseAssetLibraryInfo& Library, bool bUpdateRemaining = true, bool bPackageAssets = true, bool bUpdateFilteredAssets = true);
 	virtual bool FilterAsset(const FWwiseAssetLibraryFilteringSharedData& Shared, const FWwiseAssetLibraryInfo& Library, const WwiseAnyRef& Item);
+
+	virtual bool CreateAssetLibraryRef(FWwiseAssetLibraryRef&, const WwiseAnyRef& SourceRef);
 
 protected:
 	static FCriticalSection IsFilteringCrit;

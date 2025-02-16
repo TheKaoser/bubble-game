@@ -3,7 +3,7 @@
   "Project": {
    "Name": "bubble-game_WwiseProject",
    "GUID": "{3100FE71-A8EB-4293-959D-3200CE396146}",
-   "Generator": "2024.1.1.8691"
+   "Generator": "2024.1.2.8726"
   },
   "CacheRoot": "../.cache",
   "Platforms": [
@@ -31,6 +31,6 @@
     "UseAsStandIn": "true"
    }
   ],
-  "FileHash": "{B3659DD3-7C2D-91A1-F621-9917DB8D7F85}"
+  "FileHash": "{C1AE87B7-B705-994D-7C90-DD13893EB1E0}"
  }
 }

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseResourceLoaderModuleImpl.h"
@@ -20,7 +20,7 @@ Copyright (c) 2024 Audiokinetic Inc.
 
 IMPLEMENT_MODULE(FWwiseResourceLoaderModule, WwiseResourceLoader)
 
-FWwiseResourceLoader* FWwiseResourceLoaderModule::GetResourceLoader()
+FWwiseResourceLoaderPtr FWwiseResourceLoaderModule::GetResourceLoader()
 {
 	Lock.ReadLock();
 	if (LIKELY(ResourceLoader))
@@ -31,20 +31,21 @@ FWwiseResourceLoader* FWwiseResourceLoaderModule::GetResourceLoader()
 	{
 		Lock.ReadUnlock();
 		Lock.WriteLock();
-		if (LIKELY(!ResourceLoader))
+		if (LIKELY(!ResourceLoader.IsValid()))
 		{
 			UE_LOG(LogWwiseResourceLoader, Log, TEXT("Initializing default Resource Loader."));
-			ResourceLoader.Reset(InstantiateResourceLoader());
+			ResourceLoader.Reset();
+			ResourceLoader = InstantiateResourceLoader();
 		}
 		Lock.WriteUnlock();
 	}
-	return ResourceLoader.Get();
+	return ResourceLoader;
 }
 
-FWwiseResourceLoader* FWwiseResourceLoaderModule::InstantiateResourceLoader()
+FWwiseResourceLoaderPtr FWwiseResourceLoaderModule::InstantiateResourceLoader()
 {
 	SCOPED_WWISERESOURCELOADER_EVENT(TEXT("FWwiseResourceLoaderModule::InstantiateResourceLoader"));
-	return new FWwiseResourceLoaderImpl;
+	return MakeShared<FWwiseResourceLoaderImpl>();
 }
 
 void FWwiseResourceLoaderModule::ShutdownModule()

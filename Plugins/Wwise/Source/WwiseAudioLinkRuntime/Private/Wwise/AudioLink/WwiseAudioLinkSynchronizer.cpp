@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/AudioLink/WwiseAudioLinkSynchronizer.h"
@@ -94,16 +94,20 @@ bool FWwiseAudioLinkSynchronizer::ExecuteCloseStream()
 
 bool FWwiseAudioLinkSynchronizer::Bind()
 {
-	if (UNLIKELY(bIsBound))
+
+	if (UNLIKELY(BindingState == ESynchronizerBindingState::Bound))
 	{
 		UE_LOG(LogWwiseAudioLink, Error, TEXT("FWwiseAudioLinkSynchronizer::Bind: Binding an already bound SoundEngine."));
 		return false;
 	}
+	
+	BindingState = ESynchronizerBindingState::Binding;
 
 	auto* Callbacks = FWwiseGlobalCallbacks::Get();
 	if (UNLIKELY(!Callbacks))
 	{
 		UE_LOG(LogWwiseAudioLink, Error, TEXT("FWwiseAudioLinkSynchronizer::Bind: No Callbacks."));
+		BindingState = ESynchronizerBindingState::Unbound;
 		return false;
 	}
 
@@ -111,6 +115,7 @@ bool FWwiseAudioLinkSynchronizer::Bind()
 	if (UNLIKELY(!SoundEngine))
 	{
 		UE_LOG(LogWwiseAudioLink, Error, TEXT("FWwiseAudioLinkSynchronizer::ExecuteOpenStream: No Sound Engine."));
+		BindingState = ESynchronizerBindingState::Unbound;
 		return false;
 	}
 
@@ -118,7 +123,7 @@ bool FWwiseAudioLinkSynchronizer::Bind()
 	Callbacks->BeginRenderSync([WeakThis = AsWeak()](AK::IAkGlobalPluginContext* InContext) mutable
 	{
 		auto This = WeakThis.Pin();
-		if (UNLIKELY(!This.IsValid() || !This->bIsBound))
+		if (UNLIKELY(!This.IsValid() || This->BindingState == ESynchronizerBindingState::Unbound))
 		{
 			return EWwiseDeferredAsyncResult::Done;
 		}
@@ -130,7 +135,7 @@ bool FWwiseAudioLinkSynchronizer::Bind()
 	Callbacks->EndRenderSync([WeakThis = AsWeak()](AK::IAkGlobalPluginContext* InContext) mutable
 	{
 		auto This = WeakThis.Pin();
-		if (UNLIKELY(!This.IsValid() || !This->bIsBound))
+		if (UNLIKELY(!This.IsValid() || This->BindingState == ESynchronizerBindingState::Unbound))
 		{
 			return EWwiseDeferredAsyncResult::Done;
 		}
@@ -143,13 +148,14 @@ bool FWwiseAudioLinkSynchronizer::Bind()
 	{
 		if (!ExecuteOpenStream())
 		{
+			BindingState = ESynchronizerBindingState::Unbound;
 			return false;
 		}
 	}
 	Callbacks->InitAsync([WeakThis = AsWeak()]() mutable
 	{
 		auto This = WeakThis.Pin();
-		if (UNLIKELY(!This.IsValid() || !This->bIsBound))
+		if (UNLIKELY(!This.IsValid() || This->BindingState == ESynchronizerBindingState::Unbound))
 		{
 			return EWwiseDeferredAsyncResult::Done;
 		}
@@ -161,7 +167,7 @@ bool FWwiseAudioLinkSynchronizer::Bind()
 	Callbacks->TermAsync([WeakThis = AsWeak()]() mutable
 	{
 		auto This = WeakThis.Pin();
-		if (UNLIKELY(!This.IsValid() || !This->bIsBound))
+		if (UNLIKELY(!This.IsValid() || This->BindingState == ESynchronizerBindingState::Unbound))
 		{
 			return EWwiseDeferredAsyncResult::Done;
 		}
@@ -169,19 +175,19 @@ bool FWwiseAudioLinkSynchronizer::Bind()
 		This->ExecuteCloseStream();
 		return EWwiseDeferredAsyncResult::KeepRunning;
 	});
-	bIsBound = true;
+	BindingState = ESynchronizerBindingState::Bound;
 	return true;
 }
 
 bool FWwiseAudioLinkSynchronizer::Unbind()
 {
-	if (UNLIKELY(!bIsBound))
+	if (UNLIKELY(BindingState == ESynchronizerBindingState::Unbound))
 	{
 		return false;
 	}
 
 	UE_LOG(LogWwiseAudioLink, Verbose, TEXT("FWwiseAudioLinkSynchronizer::Bind: Unbinding SoundEngine."));
-	bIsBound = false;
+	BindingState = ESynchronizerBindingState::Unbound;
 
 	if (!ExecuteCloseStream())
 	{

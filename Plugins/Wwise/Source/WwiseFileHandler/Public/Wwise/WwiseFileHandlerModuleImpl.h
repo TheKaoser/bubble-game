@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -28,15 +28,15 @@ class WWISEFILEHANDLER_API FWwiseFileHandlerModule : public IWwiseFileHandlerMod
 public:
 	FWwiseFileHandlerModule();
 
-	IWwiseSoundBankManager* GetSoundBankManager() override;
-	IWwiseExternalSourceManager* GetExternalSourceManager() override;
-	IWwiseMediaManager* GetMediaManager() override;
+	IWwiseSoundBankManagerPtr GetSoundBankManager() override;
+	IWwiseExternalSourceManagerPtr GetExternalSourceManager() override;
+	IWwiseMediaManagerPtr GetMediaManager() override;
 	FWwiseFileCache* GetFileCache() override;
 	FWwiseExecutionQueue* GetBankExecutionQueue() override; 
 	FWwiseIOHook* InstantiateIOHook() override;
-	IWwiseSoundBankManager* InstantiateSoundBankManager() override;
-	IWwiseExternalSourceManager* InstantiateExternalSourceManager() override;
-	IWwiseMediaManager* InstantiateMediaManager() override;
+	IWwiseSoundBankManagerPtr InstantiateSoundBankManager() override;
+	IWwiseExternalSourceManagerPtr InstantiateExternalSourceManager() override;
+	IWwiseMediaManagerPtr InstantiateMediaManager() override;
 	FWwiseFileCache* InstantiateFileCache() override;
 	FWwiseExecutionQueue* InstantiateBankExecutionQueue() override; 
 
@@ -45,9 +45,9 @@ public:
 
 protected:
 	FRWLock Lock;
-	TUniquePtr<IWwiseExternalSourceManager> ExternalSourceManager;
-	TUniquePtr<IWwiseMediaManager> MediaManager;
-	TUniquePtr<IWwiseSoundBankManager> SoundBankManager;
+	IWwiseExternalSourceManagerPtr ExternalSourceManager;
+	IWwiseMediaManagerPtr MediaManager;
+	IWwiseSoundBankManagerPtr SoundBankManager;
 	TUniquePtr<FWwiseFileCache> FileCache;
 	TUniquePtr<FWwiseExecutionQueue> BankExecutionQueue;
 };

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/Packaging/WwiseAssetLibraryProcessor.h"
@@ -23,6 +23,7 @@ Copyright (c) 2024 Audiokinetic Inc.
 #include "Wwise/Packaging/WwiseAssetLibraryFilteringSharedData.h"
 #include "Wwise/Metadata/WwiseMetadataLanguage.h"
 #include "Wwise/WwiseAllowShrinking.h"
+#include "Wwise/WwiseGuidConverter.h"
 
 FCriticalSection FWwiseAssetLibraryProcessor::IsFilteringCrit;
 
@@ -160,36 +161,8 @@ void FWwiseAssetLibraryProcessor::FilterLibraryAssets(FWwiseAssetLibraryFilterin
 	for (const auto& FilteredPos : FilteredPosArray)
 	{
 		const WwiseAnyRef& SourceRef{ Shared.Sources[Shared.Remaining[FilteredPos]] };
-		
 		FWwiseAssetLibraryRef NewRef;
-		switch (SourceRef.GetType())
-		{
-		case WwiseRefType::Media:
-			NewRef.Type = EWwiseAssetLibraryRefType::Media;
-			NewRef.SoundBankId = SourceRef.GetMediaRef()->SoundBankId();
-			NewRef.LanguageId = SourceRef.GetMediaRef()->LanguageId;
-			break;
-		case WwiseRefType::SoundBank:
-			if (SourceRef.GetSoundBank()->IsInitBank())
-			{
-				NewRef.Type = EWwiseAssetLibraryRefType::InitBank;
-			}
-			else
-			{
-				NewRef.Type = EWwiseAssetLibraryRefType::SoundBank;
-			}
-			NewRef.LanguageId = SourceRef.GetSoundBankRef()->LanguageId;
-			break;
-		default: {}
-		}
-		{
-			int A, B, C, D;
-			SourceRef.GetGuid().GetGuidValues(A, B, C, D);
-			NewRef.Guid = FGuid(A, B, C, D);
-		}
-		NewRef.Id = SourceRef.GetId();
-		NewRef.Name = FName(*SourceRef.GetName());
-
+		CreateAssetLibraryRef(NewRef, SourceRef);
 		FilteredAssets.Emplace(NewRef);
 	}
 	
@@ -247,5 +220,35 @@ bool FWwiseAssetLibraryProcessor::FilterAsset(const FWwiseAssetLibraryFilteringS
 			return false;
 		}
 	}
+	return true;
+}
+
+bool FWwiseAssetLibraryProcessor::CreateAssetLibraryRef(FWwiseAssetLibraryRef& NewRef, const WwiseAnyRef& SourceRef)
+{
+	switch (SourceRef.GetType())
+	{
+	case WwiseRefType::Media:
+		NewRef.Type = EWwiseAssetLibraryRefType::Media;
+		NewRef.SoundBankId = SourceRef.GetMediaRef()->SoundBankId();
+		NewRef.LanguageId = SourceRef.GetMediaRef()->LanguageId;
+		break;
+	case WwiseRefType::SoundBank:
+		if (SourceRef.GetSoundBank()->IsInitBank())
+		{
+			NewRef.Type = EWwiseAssetLibraryRefType::InitBank;
+		}
+		else
+		{
+			NewRef.Type = EWwiseAssetLibraryRefType::SoundBank;
+		}
+		NewRef.LanguageId = SourceRef.GetSoundBankRef()->LanguageId;
+		break;
+	default: {}
+	}
+	{
+		NewRef.Guid = FWwiseGuidConverter::ToFGuid(SourceRef.GetGuid());
+	}
+	NewRef.Id = SourceRef.GetId();
+	NewRef.Name = FName(*SourceRef.GetName());
 	return true;
 }

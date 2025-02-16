@@ -10,7 +10,7 @@
     "Type": "Event",
     "GUID": "{DC564BA6-8846-496A-8470-CD4999114164}",
     "Language": "SFX",
-    "Hash": "{C6FFAB2F-8F85-B78C-8376-0A2A9AE575D4}",
+    "Hash": "{DEE7E468-D2B5-1307-D62E-2E0984A0CC61}",
     "ObjectPath": "begin_game",
     "ShortName": "begin_game",
     "Path": "Event/begin_game.bnk",
@@ -25,15 +25,6 @@
       "CachePath": "77/{77AC1062-28E0-3162-BF79-6C6392440FBA}.wem"
      },
      {
-      "Id": "671967214",
-      "Language": "SFX",
-      "Streaming": "false",
-      "Location": "Loose",
-      "ShortName": "Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 4.wav",
-      "Path": "Media/671967214.wem",
-      "CachePath": "73/{73930F8B-32DE-E42D-9BF2-1EF03C195BCD}.wem"
-     },
-     {
       "Id": "775524550",
       "Language": "SFX",
       "Streaming": "false",
@@ -41,38 +32,8 @@
       "ShortName": "wind ost_drums.wav",
       "Path": "Media/775524550.wem",
       "CachePath": "12/{12E3620D-9959-42E2-D9E0-6D9B0EA68966}.wem"
-     },
-     {
-      "Id": "872681705",
-      "Language": "SFX",
-      "Streaming": "false",
-      "Location": "Loose",
-      "ShortName": "Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 2.wav",
-      "Path": "Media/872681705.wem",
-      "CachePath": "A6/{A6BBBB67-BB2B-517C-DF86-D16A7B08FA73}.wem"
-     },
-     {
-      "Id": "1003847876",
-      "Language": "SFX",
-      "Streaming": "false",
-      "Location": "Loose",
-      "ShortName": "Ambience, Air, Skyline, Distant City Rumble, Few Birds SND64332 6.wav",
-      "Path": "Media/1003847876.wem",
-      "CachePath": "AC/{AC4AFDD1-F2F7-1950-D0A2-F183BC7B277E}.wem"
      }
     ],
-    "Plugins": {
-     "ShareSets": [
-      {
-       "Id": "3604890626",
-       "Name": "High_Pass_60Hz",
-       "ObjectPath": "\\Effects\\Factory Effects\\Parametric EQ\\High Pass Filters\\High_Pass_60Hz",
-       "GUID": "{F9627628-0B10-4272-BC30-D4C20423CB38}",
-       "LibName": "Wwise Parametric EQ",
-       "LibId": "6881283"
-      }
-     ]
-    },
     "Events": [
      {
       "Id": "131379173",
@@ -86,29 +47,13 @@
         "Id": "47136764"
        },
        {
-        "Id": "671967214"
-       },
-       {
         "Id": "775524550"
-       },
-       {
-        "Id": "872681705"
-       },
-       {
-        "Id": "1003847876"
        }
-      ],
-      "PluginRefs": {
-       "ShareSets": [
-        {
-         "Id": "3604890626"
-        }
-       ]
-      }
+      ]
      }
     ]
    }
   ],
-  "FileHash": "{A3E8ABD8-0B0F-87C8-AED0-F09984DF83DA}"
+  "FileHash": "{00BE69E6-873E-9C75-B568-DDC91A280601}"
  }
 }

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "AkAudioModule.h"
@@ -362,7 +362,7 @@ void FAkAudioModule::UpdateWwiseResourceCookerSettings()
 		UE_LOG(LogAkAudio, Error, TEXT("FAkAudioModule::UpdateWwiseResourceCookerSettings : No Project Database!"));
 		return;
 	}
-	auto* ExternalSourceManager = IWwiseExternalSourceManager::Get();
+	auto ExternalSourceManager = IWwiseExternalSourceManager::Get();
 	if (!ExternalSourceManager)
 	{
 		UE_LOG(LogAkAudio, Error, TEXT("FAkAudioModule::UpdateWwiseResourceCookerSettings : No External Source Manager!"))
@@ -466,7 +466,7 @@ void FAkAudioModule::CreateResourceCookerForPlatform(const ITargetPlatform* Targ
 		}
 	}
 	
-	auto* ExternalSourceManager = IWwiseExternalSourceManager::Get();
+	auto ExternalSourceManager = IWwiseExternalSourceManager::Get();
 	if (!ExternalSourceManager)
 	{
 		UE_LOG(LogAkAudio, Error, TEXT("FAkAudioModule::CreateResourceCookerForPlatform : No External Source Manager!"))

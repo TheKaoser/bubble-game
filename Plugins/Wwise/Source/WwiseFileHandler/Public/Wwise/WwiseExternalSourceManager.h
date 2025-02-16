@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -30,10 +30,12 @@ class IWwiseResourceCooker;
 struct FWwiseSharedPlatformId;
 #endif
 
+typedef TSharedPtr<IWwiseExternalSourceManager> IWwiseExternalSourceManagerPtr;
+
 class IWwiseExternalSourceManager : public IWwiseStreamableFileHandler
 {
 public:
-	inline static IWwiseExternalSourceManager* Get()
+	inline static IWwiseExternalSourceManagerPtr Get()
 	{
 		if (auto* Module = IWwiseFileHandlerModule::GetModule())
 		{

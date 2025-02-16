@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "AkComponentHelpers.h"
@@ -31,9 +31,7 @@ namespace AkComponentHelpers
 	bool EncompassesPoint(UPrimitiveComponent& Primitive, FVector Point, float SphereRadius /*= 0.f*/, float* OutDistanceToPoint /*= nullptr*/)
 	{
 		bool bUsePhysicsCollision = Primitive.GetOwner() != nullptr;
-#ifndef WITH_PHYSX
-		bUsePhysicsCollision = false;
-#endif
+
 		float DistanceSqr = 0.0f;
 		const UBodySetup* bodySetup = Primitive.GetBodySetup();
 		if (bodySetup == nullptr || !AkComponentHelpers::HasSimpleCollisionGeometry(bodySetup))

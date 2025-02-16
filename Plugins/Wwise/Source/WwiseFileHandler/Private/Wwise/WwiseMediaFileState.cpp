@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseMediaFileState.h"
@@ -86,7 +86,7 @@ void FWwiseInMemoryMediaFileState::LoadInSoundEngine(FLoadInSoundEngineCallback&
 		return LoadInSoundEngineFailed(MoveTemp(InCallback));
 	}
 
-	auto* MediaManager = IWwiseMediaManager::Get();
+	auto MediaManager = IWwiseMediaManager::Get();
 	if (UNLIKELY(!MediaManager))
 	{
 		UE_LOG(LogWwiseFileHandler, Log, TEXT("FWwiseInMemoryMediaFileState::LoadInSoundEngine %" PRIu32 " (%s): Failed loading without the MediaManager."), MediaId, *DebugName.ToString());
@@ -114,7 +114,7 @@ void FWwiseInMemoryMediaFileState::UnloadFromSoundEngine(FUnloadFromSoundEngineC
 {
 	SCOPED_WWISEFILEHANDLER_EVENT_3(TEXT("FWwiseInMemoryMediaFileState::UnloadFromSoundEngine"));
 
-	auto* MediaManager = IWwiseMediaManager::Get();
+	auto MediaManager = IWwiseMediaManager::Get();
 	if (UNLIKELY(!MediaManager))
 	{
 		UE_LOG(LogWwiseFileHandler, Log, TEXT("FWwiseInMemoryMediaFileState::UnloadFromSoundEngine %" PRIu32 " (%s): Failed unloading media without the MediaManager."), MediaId, *DebugName.ToString());
@@ -160,7 +160,7 @@ FWwiseStreamedMediaFileState::FWwiseStreamedMediaFileState(const FWwiseMediaCook
 
 void FWwiseStreamedMediaFileState::CloseStreaming()
 {
-	auto* MediaManager = IWwiseMediaManager::Get();
+	auto MediaManager = IWwiseMediaManager::Get();
 	if (UNLIKELY(!MediaManager))
 	{
 		UE_LOG(LogWwiseFileHandler, Log, TEXT("FWwiseStreamedMediaFileState::CloseStreaming %" PRIu32 " (%s): Closing without a MediaManager."), MediaId, *DebugName.ToString());

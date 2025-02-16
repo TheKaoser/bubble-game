@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseMediaManagerImpl.h"
@@ -37,10 +37,17 @@ FWwiseMediaManagerImpl::~FWwiseMediaManagerImpl()
 void FWwiseMediaManagerImpl::LoadMedia(const FWwiseMediaCookedData& InMediaCookedData, FLoadMediaCallback&& InCallback)
 {
 	SCOPED_WWISEFILEHANDLER_EVENT_4(TEXT("FWwiseMediaManagerImpl::LoadMedia"));
-	IncrementFileStateUseAsync(InMediaCookedData.MediaId, EWwiseFileStateOperationOrigin::Loading, [this, InMediaCookedData]() mutable
+	IncrementFileStateUseAsync(InMediaCookedData.MediaId, EWwiseFileStateOperationOrigin::Loading, [WeakThis=AsWeak(), InMediaCookedData]() mutable
 	{
 		LLM_SCOPE_BYTAG(Audio_Wwise_FileHandler_Media);
-		return CreateOp(InMediaCookedData);
+		auto SharedMediaManager = StaticCastSharedPtr<FWwiseMediaManagerImpl>(WeakThis.Pin());
+		if (!SharedMediaManager.IsValid())
+		{
+			UE_LOG(LogWwiseFileHandler, Error,
+			       TEXT("FWwiseMediaManagerImpl::LoadMedia CreateOp callback: Failed to get MediaManager"))
+			return FWwiseFileStateSharedPtr(nullptr);
+		}
+		return SharedMediaManager->CreateOp(InMediaCookedData);
 	}, [InCallback = MoveTemp(InCallback)](const FWwiseFileStateSharedPtr, bool bInResult)
 	{
 		InCallback(bInResult);

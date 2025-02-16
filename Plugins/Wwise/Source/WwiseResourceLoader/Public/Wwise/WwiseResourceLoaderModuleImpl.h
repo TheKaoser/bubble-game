@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -23,12 +23,12 @@ Copyright (c) 2024 Audiokinetic Inc.
 class WWISERESOURCELOADER_API FWwiseResourceLoaderModule : public IWwiseResourceLoaderModule
 {
 public:
-	virtual FWwiseResourceLoader* GetResourceLoader() override;
-	virtual FWwiseResourceLoader* InstantiateResourceLoader() override;
+	virtual FWwiseResourceLoaderPtr GetResourceLoader() override;
+	virtual FWwiseResourceLoaderPtr InstantiateResourceLoader() override;
 
 	virtual void ShutdownModule() override;
 
 protected:
 	FRWLock Lock;
-	TUniquePtr<FWwiseResourceLoader> ResourceLoader;
+	FWwiseResourceLoaderPtr ResourceLoader;
 };

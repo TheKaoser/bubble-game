@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "AkInitBank.h"
@@ -90,7 +90,7 @@ void UAkInitBank::UnloadInitBank(bool bAsync)
 	auto PreviouslyLoadedInitBank = LoadedInitBank.exchange(nullptr);
 	if (PreviouslyLoadedInitBank)
 	{
-		auto* ResourceLoader = FWwiseResourceLoader::Get();
+		FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 		if (UNLIKELY(!ResourceLoader))
 		{
 			return;
@@ -190,7 +190,7 @@ void UAkInitBank::UnloadData(bool bAsync)
 void UAkInitBank::LoadInitBank()
 {
 	SCOPED_AKAUDIO_EVENT_2(TEXT("LoadInitBank"));
-	auto* ResourceLoader = FWwiseResourceLoader::Get();
+	FWwiseResourceLoaderPtr ResourceLoader = FWwiseResourceLoader::Get();
 	if (UNLIKELY(!ResourceLoader))
 	{
 		return;

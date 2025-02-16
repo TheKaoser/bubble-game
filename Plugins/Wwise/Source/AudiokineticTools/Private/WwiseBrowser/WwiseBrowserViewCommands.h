@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -45,11 +45,11 @@ public:
 	 */
 	virtual void RegisterCommands() override
 	{
-		UI_COMMAND(RequestPlayWwiseItem, "Play/Stop", "Plays or stops the selected items.", EUserInterfaceActionType::Button, FInputChord(EKeys::SpaceBar));
-		UI_COMMAND(RequestStopAllWwiseItem, "Stop All", "Stop all playing events", EUserInterfaceActionType::Button, FInputChord());
+		UI_COMMAND(RequestPlayWwiseItem, "Play/Stop", "Play or stop the selected events (WAAPI must be enabled).", EUserInterfaceActionType::Button, FInputChord(EKeys::SpaceBar));
+		UI_COMMAND(RequestStopAllWwiseItem, "Stop All", "Stop all playing events.", EUserInterfaceActionType::Button, FInputChord());
 		UI_COMMAND(RequestExploreWwiseItem, "Show in Folder", "Finds this item on disk.", EUserInterfaceActionType::Button, FInputChord());
 		UI_COMMAND(RequestFindInProjectExplorerWwiseItem, "Find in the Wwise Project Explorer", "Finds the specified object in the Project Explorer (Sync Group 1).", EUserInterfaceActionType::Button, FInputChord(EModifierKey::Control | EModifierKey::Shift, EKeys::One));
-		UI_COMMAND(RequestFindInContentBrowser, "Find in Content Browser ", "Locates the corresponding item inside the Content Browser", EUserInterfaceActionType::Button, FInputChord());
+		UI_COMMAND(RequestFindInContentBrowser, "Find in Content Browser ", "Locates the corresponding item inside the Content Browser.", EUserInterfaceActionType::Button, FInputChord());
 		UI_COMMAND(RequestRefreshWwiseBrowser, "Refresh All", "Populates the Wwise Browser.", EUserInterfaceActionType::Button, FInputChord(EKeys::F5));
 		UI_COMMAND(RequestImportWwiseItem, "Import Selected Assets", "Imports the selected assets from the Wwise Browser.", EUserInterfaceActionType::Button, FInputChord());
 		UI_COMMAND(RequestReconcileWwiseItem, "Reconcile Selected Assets", "Reconcile the selected assets from the Wwise Browser.", EUserInterfaceActionType::Button, FInputChord());

@@ -344,12 +344,12 @@ void APaperBubble::ChangeBehavior()
     PaperFlipbookActor->GetRenderComponent()->SetPlaybackPositionInFrames(0, false);
     PaperFlipbookActor->GetRenderComponent()->SetLooping(false);
 
+    OnLevelChange();
     GetWorldTimerManager().SetTimer(TimerHandle, this, &APaperBubble::ChangeLevel, 1.8f, false);
 }
 
 void APaperBubble::ChangeLevel()
 {
-    OnLevelChange();
     for (TObjectIterator<AActor> It; It; ++It)
     {
         if (It->GetWorld() && (It->GetWorld()->WorldType == EWorldType::PIE || It->GetWorld()->WorldType == EWorldType::Game))

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -23,6 +23,7 @@ Copyright (c) 2024 Audiokinetic Inc.
 
 class FWwiseResourceLoaderImpl;
 class FWwiseResourceLoader;
+typedef TSharedPtr<FWwiseResourceLoader> FWwiseResourceLoaderPtr;
 
 class IWwiseResourceLoaderModule : public IModuleInterface
 {
@@ -97,8 +98,8 @@ public:
 #endif
 	}
 
-	virtual FWwiseResourceLoader* GetResourceLoader() { return nullptr; }
-	virtual FWwiseResourceLoader* InstantiateResourceLoader() { return nullptr; }
+	virtual FWwiseResourceLoaderPtr GetResourceLoader() { return nullptr; }
+	virtual FWwiseResourceLoaderPtr InstantiateResourceLoader() { return nullptr; }
 
 private:
 	static inline FName GetModuleNameFromConfig()

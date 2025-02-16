@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 /*=============================================================================
@@ -616,6 +616,7 @@ void UAkLateReverbComponent::InitTextVisualizers()
 		TextVisualizerLabels->ResetRelativeTransform();
 		TextVisualizerLabels->SetWorldScale3D(FVector::OneVector);
 		TextVisualizerLabels->SetWorldLocation(GetTextVisualizersLocation());
+		TextVisualizerLabels->SetHiddenInGame(true);
 		if (World != nullptr && World->WorldType == EWorldType::EditorPreview)
 		{
 			TextVisualizerLabels->SetWorldRotation(FVector(100, 0, 0).Rotation());
@@ -637,6 +638,7 @@ void UAkLateReverbComponent::InitTextVisualizers()
 		TextVisualizerValues->ResetRelativeTransform();
 		TextVisualizerValues->SetWorldScale3D(FVector::OneVector);
 		TextVisualizerValues->SetWorldLocation(GetTextVisualizersLocation());
+		TextVisualizerValues->SetHiddenInGame(true);
 		if (World != nullptr && World->WorldType == EWorldType::EditorPreview)
 		{
 			TextVisualizerValues->SetWorldRotation(FVector(100, 0, 0).Rotation());

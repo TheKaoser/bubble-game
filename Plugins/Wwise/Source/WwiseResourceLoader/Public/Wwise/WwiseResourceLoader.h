@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -35,16 +35,22 @@ Copyright (c) 2024 Audiokinetic Inc.
 class IWwiseSoundBankManager;
 class IWwiseExternalSourceManager;
 class IWwiseMediaManager;
+typedef TSharedPtr<IWwiseSoundBankManager> IWwiseSoundBankManagerPtr;
+typedef TSharedPtr<IWwiseExternalSourceManager> IWwiseExternalSourceManagerPtr;
+typedef TSharedPtr<IWwiseMediaManager> IWwiseMediaManagerPtr;
+
+typedef TSharedPtr<FWwiseResourceLoader> FWwiseResourceLoaderPtr;
 /**
  * @brief Operations available to manage and handle Wwise SoundBanks in Unreal.
+ * Requires TSharedFromThis as operations using the Resource Loader can be executed after 
 */
-class WWISERESOURCELOADER_API FWwiseResourceLoader
+class WWISERESOURCELOADER_API FWwiseResourceLoader: public TSharedFromThis<FWwiseResourceLoader>
 {
 public:
 	using FWwiseSetLanguageFuture = TWwiseFuture<void>;
 	using FWwiseSetLanguagePromise = TWwisePromise<void>;
 
-	inline static FWwiseResourceLoader* Get()
+	inline static FWwiseResourceLoaderPtr Get()
 	{
 		if (auto* Module = IWwiseResourceLoaderModule::GetModule())
 		{
@@ -52,7 +58,7 @@ public:
 		}
 		return nullptr;
 	}
-	static FWwiseResourceLoader* Instantiate()
+	static FWwiseResourceLoaderPtr Instantiate()
 	{
 		if (auto* Module = IWwiseResourceLoaderModule::GetModule())
 		{
@@ -62,9 +68,9 @@ public:
 	}
 
 #if WITH_EDITORONLY_DATA
-	static FWwiseResourceLoader* Instantiate(const FWwiseResourceLoader& InDefaultResourceLoader, const FWwiseSharedPlatformId& InPlatform)
+	static FWwiseResourceLoaderPtr Instantiate(const FWwiseResourceLoader& InDefaultResourceLoader, const FWwiseSharedPlatformId& InPlatform)
 	{
-		if (auto* ResourceLoader = Instantiate())
+		if (FWwiseResourceLoaderPtr ResourceLoader = Instantiate())
 		{
 			ResourceLoader->PrepareResourceLoaderForPlatform(InDefaultResourceLoader, InPlatform);
 			return ResourceLoader;

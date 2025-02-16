@@ -1,6 +1,3 @@
 Event	ID	Name			Wwise Object Path	Notes
 	131379173	begin_game			\InGameSFX\begin_game	
 
-Effect plug-ins	ID	Name	Type				Notes
-	3604890626	High_Pass_60Hz	Wwise Parametric EQ			
-

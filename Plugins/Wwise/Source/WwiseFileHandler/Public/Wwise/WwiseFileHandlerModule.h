@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -26,6 +26,10 @@ class IWwiseSoundBankManager;
 class IWwiseExternalSourceManager;
 class IWwiseMediaManager;
 struct FWwiseExecutionQueue;
+
+typedef TSharedPtr<IWwiseExternalSourceManager> IWwiseExternalSourceManagerPtr;
+typedef TSharedPtr<IWwiseMediaManager> IWwiseMediaManagerPtr;
+typedef TSharedPtr<IWwiseSoundBankManager> IWwiseSoundBankManagerPtr;
 
 class IWwiseFileHandlerModule : public IModuleInterface
 {
@@ -92,15 +96,15 @@ public:
 		return Module;
 	}
 
-	virtual IWwiseSoundBankManager* GetSoundBankManager() { return nullptr; }
-	virtual IWwiseExternalSourceManager* GetExternalSourceManager() { return nullptr; }
-	virtual IWwiseMediaManager* GetMediaManager() { return nullptr; }
+	virtual IWwiseSoundBankManagerPtr GetSoundBankManager() { return nullptr; }
+	virtual IWwiseExternalSourceManagerPtr GetExternalSourceManager() { return nullptr; }
+	virtual IWwiseMediaManagerPtr GetMediaManager() { return nullptr; }
 	virtual FWwiseFileCache* GetFileCache() { return nullptr; }
 	virtual FWwiseExecutionQueue* GetBankExecutionQueue() { return nullptr; } 
 	virtual FWwiseIOHook* InstantiateIOHook() { return nullptr; }
-	virtual IWwiseSoundBankManager* InstantiateSoundBankManager() { return nullptr; }
-	virtual IWwiseExternalSourceManager* InstantiateExternalSourceManager() { return nullptr; }
-	virtual IWwiseMediaManager* InstantiateMediaManager() { return nullptr; }
+	virtual IWwiseSoundBankManagerPtr InstantiateSoundBankManager() { return nullptr; }
+	virtual IWwiseExternalSourceManagerPtr InstantiateExternalSourceManager() { return nullptr; }
+	virtual IWwiseMediaManagerPtr InstantiateMediaManager() { return nullptr; }
 	virtual FWwiseFileCache* InstantiateFileCache() { return nullptr; }
 	virtual FWwiseExecutionQueue* InstantiateBankExecutionQueue() { return nullptr; } 
 

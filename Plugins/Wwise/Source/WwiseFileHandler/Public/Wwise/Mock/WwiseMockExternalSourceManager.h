@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -36,22 +36,29 @@ public:
 		SCOPED_WWISEFILEHANDLER_EVENT_4(TEXT("FWwiseMockExternalSourceManager::LoadExternalSource"))
 
 		// NOTE We are assuming a correspondence between Cookie and MediaId. This need not be the case, see the WwiseSimpleExtSrcManager for an example implementation of CookieMediaId maps
-		IncrementFileStateUseAsync(InExternalSourceCookedData.Cookie, EWwiseFileStateOperationOrigin::Loading, [this, InExternalSourceCookedData]() mutable 
+		IncrementFileStateUseAsync(InExternalSourceCookedData.Cookie, EWwiseFileStateOperationOrigin::Loading, [WeakThis=AsWeak(), InExternalSourceCookedData]() mutable 
 		{
-			return CreateOp(InExternalSourceCookedData);
+			auto SharedMockExternalSourceManager = StaticCastSharedPtr<FWwiseMockExternalSourceManager>(WeakThis.Pin());
+			if (!SharedMockExternalSourceManager.IsValid())
+			{
+				UE_LOG(LogWwiseFileHandler, Error,
+				       TEXT("FWwiseMockSoundBankManager::LoadSoundBank CreateOp Callback: Failed to get Mock ExternalSourceManager"))
+				return FWwiseFileStateSharedPtr(nullptr);
+			}
+			return SharedMockExternalSourceManager->CreateOp(InExternalSourceCookedData);
 		}, [InCallback = MoveTemp(InCallback)](const FWwiseFileStateSharedPtr, bool bInResult)
 		{
 			InCallback(bInResult);
 		});
 	}
-	
+
 	virtual void UnloadExternalSource(const FWwiseExternalSourceCookedData& InExternalSourceCookedData,
 		const FWwiseLanguageCookedData& InLanguage, FUnloadExternalSourceCallback&& InCallback) override
 	{
 		SCOPED_WWISEFILEHANDLER_EVENT_4(TEXT("FWwiseMockExternalSourceManager::UnLoadExternalSource"))
 		DecrementFileStateUseAsync(InExternalSourceCookedData.Cookie, nullptr, EWwiseFileStateOperationOrigin::Loading, MoveTemp(InCallback));
 	}
-	
+
 	virtual void SetGranularity(uint32 InStreamingGranularity) override {}
 
 	IWwiseStreamingManagerHooks& GetStreamingHooks() override final { return *this; }

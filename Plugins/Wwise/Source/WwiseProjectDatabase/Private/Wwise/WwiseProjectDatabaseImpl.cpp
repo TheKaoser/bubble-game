@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseProjectDatabaseImpl.h"
@@ -45,7 +45,7 @@ void FWwiseProjectDatabaseImpl::UpdateDataStructure(const WwiseDBGuid* InBasePla
 	WwiseDBSharedPlatformId Platform;
 	FDirectoryPath SourcePath;
 	{
-		auto* ResourceLoader = GetResourceLoader();
+		FWwiseResourceLoaderPtr ResourceLoader = GetResourceLoader();
 		if (UNLIKELY(!ResourceLoader))
 		{
 			return;
@@ -119,7 +119,7 @@ void FWwiseProjectDatabaseImpl::UpdateDataStructure(const WwiseDBGuid* InBasePla
 					}
 				}
 				//Update the resource loader current platform as internal data may have changed
-				auto* ResourceLoader = GetResourceLoader();
+				FWwiseResourceLoaderPtr ResourceLoader = GetResourceLoader();
 				if (UNLIKELY(!ResourceLoader))
 				{
 					return;
@@ -157,16 +157,16 @@ void FWwiseProjectDatabaseImpl::UpdateDataStructure(const WwiseDBGuid* InBasePla
 	}
 }
 
-void FWwiseProjectDatabaseImpl::PrepareProjectDatabaseForPlatform(FWwiseResourceLoader*&& InResourceLoader)
+void FWwiseProjectDatabaseImpl::PrepareProjectDatabaseForPlatform(FWwiseResourceLoaderPtr&& InResourceLoader)
 {
-	ResourceLoaderOverride.Reset(InResourceLoader);
+	ResourceLoaderOverride = InResourceLoader;
 }
 
-FWwiseResourceLoader* FWwiseProjectDatabaseImpl::GetResourceLoader()
+FWwiseResourceLoaderPtr FWwiseProjectDatabaseImpl::GetResourceLoader()
 {
 	if (ResourceLoaderOverride.IsValid())
 	{
-		return ResourceLoaderOverride.Get();
+		return ResourceLoaderOverride;
 	}
 	else
 	{
@@ -174,11 +174,11 @@ FWwiseResourceLoader* FWwiseProjectDatabaseImpl::GetResourceLoader()
 	}
 }
 
-const FWwiseResourceLoader* FWwiseProjectDatabaseImpl::GetResourceLoader() const
+const FWwiseResourceLoaderPtr FWwiseProjectDatabaseImpl::GetResourceLoader() const
 {
 	if (ResourceLoaderOverride.IsValid())
 	{
-		return ResourceLoaderOverride.Get();
+		return ResourceLoaderOverride;
 	}
 	else
 	{

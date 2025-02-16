@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -34,9 +34,16 @@ public:
 	void LoadMedia(const FWwiseMediaCookedData& InMediaCookedData, FLoadMediaCallback&& InCallback) override
 	{
 		SCOPED_WWISEFILEHANDLER_EVENT_4(TEXT("FWwiseMockMediaManager::LoadMedia"));
-		IncrementFileStateUseAsync(InMediaCookedData.MediaId, EWwiseFileStateOperationOrigin::Loading, [this, InMediaCookedData]() mutable
+		IncrementFileStateUseAsync(InMediaCookedData.MediaId, EWwiseFileStateOperationOrigin::Loading, [WeakThis=AsWeak(), InMediaCookedData]() mutable
 		{
-			return CreateOp(InMediaCookedData);
+			auto SharedMockMediaManager = StaticCastSharedPtr<FWwiseMockMediaManager>(WeakThis.Pin());
+			if (!SharedMockMediaManager.IsValid())
+			{
+				UE_LOG(LogWwiseFileHandler, Error,
+				       TEXT("FWwiseMockSoundBankManager::LoadSoundBank: Failed to get Mock MediaManager"))
+				return FWwiseFileStateSharedPtr(nullptr);
+			}
+			return SharedMockMediaManager->CreateOp(InMediaCookedData);
 		}, [InCallback = MoveTemp(InCallback)](const FWwiseFileStateSharedPtr, bool bInResult)
 		{
 			InCallback(bInResult);

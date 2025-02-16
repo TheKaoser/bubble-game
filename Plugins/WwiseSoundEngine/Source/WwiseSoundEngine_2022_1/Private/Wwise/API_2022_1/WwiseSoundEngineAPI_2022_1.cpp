@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/API_2022_1/WwiseSoundEngineAPI_2022_1.h"
@@ -43,7 +43,7 @@ Copyright (c) 2024 Audiokinetic Inc.
 #endif // PLATFORM_MICROSOFT
 
 FWwiseSoundEngineAPI_2022_1::FWwiseSoundEngineAPI_2022_1():
-	IWwiseSoundEngineAPI(new FQuery, new FAudioInputPlugin)
+	IWwiseSoundEngineAPI(new FQuery, new FAudioInputPlugin, new FDynamicDialogue, new FDynamicSequence)
 {}
 
 bool FWwiseSoundEngineAPI_2022_1::IsInitialized()
@@ -2420,6 +2420,249 @@ void FWwiseSoundEngineAPI_2022_1::FAudioInputPlugin::SetAudioInputCallbacks(
 	::SetAudioInputCallbacks(in_pfnExecCallback, in_pfnGetFormatCallback, in_pfnGetGainCallback);
 }
 
+AkUniqueID FWwiseSoundEngineAPI_2022_1::FDynamicDialogue::ResolveDialogueEvent(
+		AkUniqueID			in_eventID,
+		AkArgumentValueID*	in_aArgumentValues,
+		AkUInt32			in_uNumArguments,
+		AkPlayingID			in_idSequence,
+		AkCandidateCallbackFunc in_candidateCallbackFunc,
+		void* in_pCookie
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent(in_eventID, in_aArgumentValues, in_uNumArguments, in_idSequence, in_candidateCallbackFunc, in_pCookie);
+}
+
+#ifdef AK_SUPPORT_WCHAR
+AkUniqueID FWwiseSoundEngineAPI_2022_1::FDynamicDialogue::ResolveDialogueEvent(
+		const wchar_t*		in_pszEventName,
+		const wchar_t**		in_aArgumentValueNames,
+		AkUInt32			in_uNumArguments,
+		AkPlayingID			in_idSequence,
+		AkCandidateCallbackFunc in_candidateCallbackFunc,
+		void* in_pCookie
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent(in_pszEventName, in_aArgumentValueNames, in_uNumArguments, in_idSequence, in_candidateCallbackFunc, in_pCookie);
+}
+#endif //AK_SUPPORT_WCHAR
+
+AkUniqueID FWwiseSoundEngineAPI_2022_1::FDynamicDialogue::ResolveDialogueEvent(
+		const char*			in_pszEventName,
+		const char**		in_aArgumentValueNames,
+		AkUInt32			in_uNumArguments,
+		AkPlayingID			in_idSequence,
+		AkCandidateCallbackFunc in_candidateCallbackFunc,
+		void* in_pCookie
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent(in_pszEventName, in_aArgumentValueNames, in_uNumArguments, in_idSequence, in_candidateCallbackFunc, in_pCookie);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicDialogue::GetDialogueEventCustomPropertyValue(
+	AkUniqueID in_eventID,
+	AkUInt32 in_uPropID,
+	AkInt32& out_iValue
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicDialogue::GetDialogueEventCustomPropertyValue(in_eventID, in_uPropID, out_iValue);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicDialogue::GetDialogueEventCustomPropertyValue(
+	AkUniqueID in_eventID,
+	AkUInt32 in_uPropID,
+	AkReal32& out_fValue
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicDialogue::GetDialogueEventCustomPropertyValue(in_eventID, in_uPropID, out_fValue);
+}
+
+void FWwiseSoundEngineAPI_2022_1::FDynamicSequence::FPlaylist::Enqueue(
+		AkUniqueID in_audioNodeID,
+		AkTimeMs in_msDelay,
+		void * in_pCustomInfo,
+		AkUInt32 in_cExternals,
+		AkExternalSourceInfo *in_pExternalSources
+		)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	Playlist.Enqueue(in_audioNodeID, in_msDelay, in_pCustomInfo, in_cExternals, in_pExternalSources);
+}
+
+void FWwiseSoundEngineAPI_2022_1::FDynamicSequence::FPlaylist::RemoveAll(int Reserve)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	Playlist.RemoveAll();
+	Playlist.Reserve(Reserve);
+}
+
+AK::SoundEngine::DynamicSequence::PlaylistItem* FWwiseSoundEngineAPI_2022_1::FDynamicSequence::FPlaylist::Insert(unsigned int in_uIndex)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return Playlist.Insert(in_uIndex);
+}
+
+void FWwiseSoundEngineAPI_2022_1::FDynamicSequence::FPlaylist::Erase(unsigned int in_uIndex)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	Playlist.Erase(in_uIndex);
+}
+
+AK::SoundEngine::DynamicSequence::PlaylistItem& FWwiseSoundEngineAPI_2022_1::FDynamicSequence::FPlaylist::operator[](unsigned int uiIndex) const
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return Playlist[uiIndex];
+}
+
+bool FWwiseSoundEngineAPI_2022_1::FDynamicSequence::FPlaylist::IsEmpty() const
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return Playlist.IsEmpty();
+}
+
+uint32 FWwiseSoundEngineAPI_2022_1::FDynamicSequence::FPlaylist::Length() const
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return Playlist.Length();
+}
+
+AkPlayingID FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Open(
+	AkGameObjectID		in_gameObjectID,
+	AkUInt32			in_uFlags,
+	AkCallbackFunc		in_pfnCallback,
+	void* 				in_pCookie,
+	AK::SoundEngine::DynamicSequence::DynamicSequenceType in_eDynamicSequenceType
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Open(in_gameObjectID, in_uFlags, in_pfnCallback, in_pCookie, in_eDynamicSequenceType);
+}
+											
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Close(
+	AkPlayingID in_playingID
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Close(in_playingID);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Play( 
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Play(in_playingID, in_uTransitionDuration, in_eFadeCurve);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Pause( 
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Pause(in_playingID, in_uTransitionDuration, in_eFadeCurve);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Resume(
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Resume(in_playingID, in_uTransitionDuration, in_eFadeCurve);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Stop(
+	AkPlayingID in_playingID,
+	AkTimeMs in_uTransitionDuration,
+	AkCurveInterpolation in_eFadeCurve
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Stop(in_playingID, in_uTransitionDuration, in_eFadeCurve);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Break(
+	AkPlayingID in_playingID
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Break(in_playingID);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Seek(
+	AkPlayingID in_playingID,
+	AkTimeMs in_iPosition,
+	bool in_bSeekToNearestMarker
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Seek(in_playingID, in_iPosition, in_bSeekToNearestMarker);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::Seek(
+	AkPlayingID in_playingID,
+	AkReal32 in_fPercent,
+	bool in_bSeekToNearestMarker
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::Seek(in_playingID, in_fPercent, in_bSeekToNearestMarker);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::GetPauseTimes(
+	AkPlayingID in_playingID,
+	AkUInt32 &out_uTime,
+	AkUInt32 &out_uDuration
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::GetPauseTimes(in_playingID, out_uTime, out_uDuration);
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::GetPlayingItem(
+	AkPlayingID in_playingID,
+	AkUniqueID & out_audioNodeID,
+	void *& out_pCustomInfo
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	return AK::SoundEngine::DynamicSequence::GetPlayingItem(in_playingID, out_audioNodeID, out_pCustomInfo);
+}
+
+FWwiseSoundEngineAPI_2022_1::FDynamicSequence::IPlaylist* FWwiseSoundEngineAPI_2022_1::FDynamicSequence::LockPlaylist(
+	AkPlayingID in_playingID
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	if (auto* Playlist = AK::SoundEngine::DynamicSequence::LockPlaylist(in_playingID))
+	{
+		return new FPlaylist(in_playingID, *Playlist);
+	}
+	return nullptr;
+}
+
+AKRESULT FWwiseSoundEngineAPI_2022_1::FDynamicSequence::UnlockPlaylist(
+	IPlaylist* in_Playlist
+	)
+{
+	SCOPE_CYCLE_COUNTER(STAT_WwiseSoundEngineAPI);
+	if (LIKELY(in_Playlist))
+	{
+		auto Result = AK::SoundEngine::DynamicSequence::UnlockPlaylist(in_Playlist->GetPlayingID());
+		delete in_Playlist;
+		return Result;
+	}
+	return AK_Success;
+}
 
 #if WITH_EDITORONLY_DATA
 FWwiseSoundEngineAPI_2022_1::FErrorTranslator::FErrorTranslator(FGetInfoErrorMessageTranslatorFunction InMessageTranslatorFunction) :

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseExecutionQueue.h"
@@ -265,10 +265,12 @@ bool FWwiseExecutionQueue::KeepWorking()
 {
 	const auto CurrentThreadId = FPlatformTLS::GetCurrentThreadId();
 	const auto bDeleteOnceClosedCopy = this->bDeleteOnceClosed;
+	const TCHAR* LocalDebugName = DebugName;
+	const void* LocalThis = this;
 
 	if (LIKELY(TrySetRunningWorkerToStopped()))
 	{
-		UE_CLOG(Test::IsExtremelyVerbose(), LogWwiseConcurrency, VeryVerbose, TEXT("FWwiseExecutionQueue::KeepWorking(%p \"%s\") [%" PRIi32 "]: Stopped worker."), this, DebugName, CurrentThreadId);
+		UE_CLOG(Test::IsExtremelyVerbose(), LogWwiseConcurrency, VeryVerbose, TEXT("FWwiseExecutionQueue::KeepWorking(%p \"%s\") [%" PRIi32 "]: Stopped worker."), LocalThis, LocalDebugName, CurrentThreadId);
 		// We don't have any more operations queued. Done.
 		// Don't execute operations here, as the Execution Queue might be deleted here.
 		return false;
@@ -324,7 +326,7 @@ void FWwiseExecutionQueue::ProcessWork()
 
 	auto* PreviousExecutionQueue = TLS::CurrentExecutionQueue;
 	TLS::CurrentExecutionQueue = this;
-	
+
 	for (const FOpQueueItem* Op; (Op = OpQueue.Peek()) != nullptr; OpQueue.Pop())
 	{
 #if ENABLE_NAMED_EVENTS

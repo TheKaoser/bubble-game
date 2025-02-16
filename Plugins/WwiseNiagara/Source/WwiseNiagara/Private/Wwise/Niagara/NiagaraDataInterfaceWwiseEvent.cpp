@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/Niagara/NiagaraDataInterfaceWwiseEvent.h"
@@ -55,13 +55,13 @@ struct FNiagaraPostEventDIFunctionVersion
 
 namespace NiagaraWwiseParticleHelpers
 {
-	UAkComponent* SpawnAkComponentAtLocation(class UAkAudioEvent* AkEvent, const USceneComponent* NiagaraComponent, FVector Location, FRotator Orientation, UWorld* World, bool bStopWhenDestroyed, bool bVisualizeComponent = false)
+	UAkComponent* SpawnAkComponentAtLocation(class UAkAudioEvent* AkEvent, USceneComponent* NiagaraComponent, FVector Location, FRotator Orientation, UWorld* World, bool bStopWhenDestroyed, bool bVisualizeComponent = false)
 	{
 		SCOPED_WWISENIAGARA_EVENT_2(TEXT("NiagaraWwiseParticleHelpers::SpawnAkComponentAtLocation"));
 		UAkComponent* AkComponent;
 		if (NiagaraComponent)
 		{
-			AkComponent = NewObject<UAkComponent>(NiagaraComponent->GetOwner());
+			AkComponent = NewObject<UAkComponent>(NiagaraComponent);
 		}
 		else if (World)
 		{
@@ -313,6 +313,10 @@ bool UNiagaraDataInterfaceWwiseEvent::PerInstanceTickPostSimulate(void* PerInsta
 			UAkComponent* AudioComponent = WeakComponent.IsValid() ? WeakComponent.Get() : nullptr;
 			if (AudioComponent)
 			{
+				if (PIData->bStopWhenComponentIsDestroyed)
+				{
+					AudioComponent->Stop();
+				}
 				AudioComponent->ConditionalBeginDestroy();
 			}
 			Iterator.RemoveCurrent();

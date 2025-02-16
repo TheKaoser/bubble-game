@@ -10,7 +10,7 @@
     "Type": "Event",
     "GUID": "{AA7DA903-8478-4CDD-8DD4-66FF3FDB7B16}",
     "Language": "SFX",
-    "Hash": "{25117063-ABBF-76E3-598D-E14E804FF097}",
+    "Hash": "{370999D4-F3AB-194F-C5B2-9F87054CF57F}",
     "ObjectPath": "level_trans",
     "ShortName": "level_trans",
     "Path": "Event/level_trans.bnk",
@@ -66,6 +66,6 @@
     ]
    }
   ],
-  "FileHash": "{D0A1A6CF-BAC7-0E3C-979C-C04A0183922F}"
+  "FileHash": "{C841840C-C539-6A26-AED5-5A9D8C88B415}"
  }
 }

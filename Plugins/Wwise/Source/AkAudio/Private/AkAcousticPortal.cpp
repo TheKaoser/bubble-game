@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 /*=============================================================================
@@ -260,6 +260,7 @@ void UAkPortalComponent::InitializeDrawComponent()
 			DrawPortalComponent->CreationMethod = CreationMethod;
 			DrawPortalComponent->RegisterComponentWithWorld(GetWorld());
 			DrawPortalComponent->MarkRenderStateDirty();
+			DrawPortalComponent->SetHiddenInGame(true);
 		}
 	}
 }
@@ -474,6 +475,7 @@ bool UAkPortalComponent::UpdateConnectedRooms(bool in_bForceUpdate/* = false*/)
 	TWeakObjectPtr<UAkRoomComponent> pPreviousBack = BackRoom;
 	AkRoomID previousFrontID = GetFrontRoomID();
 	AkRoomID previousBackID = GetBackRoomID();
+
 	/* Update the room connections */
 	FrontRoom = TWeakObjectPtr<UAkRoomComponent>();
 	BackRoom = TWeakObjectPtr<UAkRoomComponent>();
@@ -485,7 +487,9 @@ bool UAkPortalComponent::UpdateConnectedRooms(bool in_bForceUpdate/* = false*/)
 	bool bRoomsChanged = false;
 	bool PortalIsValid = PortalPlacementValid();
 
-	if (in_bForceUpdate || GetFrontRoomID() != previousFrontID)
+	// Update the portal if the rooms have changed or if the previous rooms were stale
+	// A room can become stale when it is unregistered.
+	if (in_bForceUpdate || GetFrontRoomID() != previousFrontID || pPreviousFront.IsStale())
 	{
 		bRoomsChanged = true;
 
@@ -511,7 +515,7 @@ bool UAkPortalComponent::UpdateConnectedRooms(bool in_bForceUpdate/* = false*/)
 		}
 	}
 
-	if (in_bForceUpdate || GetBackRoomID() != previousBackID)
+	if (in_bForceUpdate || GetBackRoomID() != previousBackID || pPreviousBack.IsStale())
 	{
 		bRoomsChanged = true;
 
@@ -701,6 +705,7 @@ void UAkPortalComponent::InitTextVisualizers()
 			Text->bAlwaysRenderAsText = true;
 			Text->SetHorizontalAlignment(EHTA_Center);
 			Text->SetWorldScale3D(FVector(1.0f));
+			Text->SetHiddenInGame(true);
 		}
 		FrontRoomText->SetVerticalAlignment(EVRTA_TextTop);
 		BackRoomText->SetVerticalAlignment(EVRTA_TextBottom);

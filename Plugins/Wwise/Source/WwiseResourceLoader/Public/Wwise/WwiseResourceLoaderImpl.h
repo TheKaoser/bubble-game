@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -23,6 +23,10 @@ Copyright (c) 2024 Audiokinetic Inc.
 #include "Wwise/WwiseResourceLoaderState.h"
 #include "Wwise/WwiseSwitchContainerLoadedGroupValueInfo.h"
 
+/**
+ * @brief Operations available to manage and handle Wwise SoundBanks in Unreal.
+ * Default implementation.
+*/
 class WWISERESOURCELOADER_API FWwiseResourceLoaderImpl : public FWwiseResourceLoader
 {
 public:
@@ -38,7 +42,7 @@ public:
 	 * This can be called by derived classes if you want to modify the default Resource Loader behavior.
 	 */
 	FWwiseResourceLoaderImpl();
-
+	
 	/**
 	 * Constructor used for mock testing the Resource Loader. Hard-codes the different managers.
 	 * 
@@ -46,9 +50,11 @@ public:
 	 * @param MediaManager Media Manager file handler to be used in this instance
 	 * @param SoundBankManager  SoundBank Manager file handler to be used in this instance
 	 */
-	FWwiseResourceLoaderImpl(IWwiseExternalSourceManager& ExternalSourceManager, IWwiseMediaManager& MediaManager, IWwiseSoundBankManager& SoundBankManager);
+	FWwiseResourceLoaderImpl(const TSharedRef<IWwiseExternalSourceManager>& ExternalSourceManager,
+	                         const TSharedRef<IWwiseMediaManager>& MediaManager,
+	                         const TSharedRef<IWwiseSoundBankManager>& SoundBankManager);
 
-	virtual ~FWwiseResourceLoaderImpl() {}
+	virtual ~FWwiseResourceLoaderImpl() override;
 
 	virtual EWwiseResourceLoaderState GetResourceLoaderState();
 	virtual void SetResourceLoaderState(EWwiseResourceLoaderState State);
@@ -228,11 +234,11 @@ protected:
 	*/
 	TSet<FWwiseSwitchContainerLoadedGroupValueInfo> LoadedGroupValueInfo;
 
-	mutable FWwiseExecutionQueue ExecutionQueue;
+	mutable FWwiseExecutionQueue* ExecutionQueue;
 
-	mutable IWwiseExternalSourceManager* ExternalSourceManager{nullptr};
-	mutable IWwiseMediaManager* MediaManager{nullptr};
-	mutable IWwiseSoundBankManager* SoundBankManager{nullptr};
+	mutable IWwiseExternalSourceManagerPtr ExternalSourceManager{nullptr};
+	mutable IWwiseMediaManagerPtr MediaManager{nullptr};
+	mutable IWwiseSoundBankManagerPtr SoundBankManager{nullptr};
 
 	virtual void LoadAuxBusResources(FWwiseResourceLoadPromise&& Promise, FWwiseLoadedAuxBusInfo::FLoadedData& LoadedData, const FWwiseAuxBusCookedData& InCookedData);
 	virtual void LoadEventResources(FWwiseResourceLoadPromise&& Promise, FWwiseLoadedEventInfo::FLoadedData& LoadedData, const FWwiseEventCookedData& InCookedData);

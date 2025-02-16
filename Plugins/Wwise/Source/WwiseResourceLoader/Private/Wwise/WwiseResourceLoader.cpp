@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseResourceLoader.h"
@@ -251,7 +251,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadAssetLibraryAsync(FWwiseL
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadAssetLibraryAsync"), [this, InAssetLibrary = MoveTemp(InAssetLibrary), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadAssetLibraryAsync"), [WeakThis=AsWeak(), InAssetLibrary = MoveTemp(InAssetLibrary), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -273,7 +273,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadAssetLibraryAsync(FWwiseL
 			}
 			auto* AssetLibrary = InAssetLibrary.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadAssetLibraryAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -284,7 +290,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadAssetLibraryAsync(FWwiseL
 			}
 			else
 			{
-				UnloadAssetLibraryNode(MoveTemp(Promise), MoveTemp(AssetLibrary));
+				SharedResourceLoader->UnloadAssetLibraryNode(MoveTemp(Promise), MoveTemp(AssetLibrary));
 			}
 		});
 	}
@@ -341,7 +347,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadAuxBusAsync(FWwiseLoadedA
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadAuxBusAsync"), [this, InAuxBus = MoveTemp(InAuxBus), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadAuxBusAsync"), [WeakThis=AsWeak(), InAuxBus = MoveTemp(InAuxBus), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -363,7 +369,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadAuxBusAsync(FWwiseLoadedA
 			}
 			auto* AuxBus = InAuxBus.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadAuxBusAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -374,7 +386,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadAuxBusAsync(FWwiseLoadedA
 			}
 			else
 			{
-				UnloadAuxBusNode(MoveTemp(Promise), MoveTemp(AuxBus));
+				SharedResourceLoader->UnloadAuxBusNode(MoveTemp(Promise), MoveTemp(AuxBus));
 			}
 		});
 	}
@@ -431,7 +443,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadEventAsync(FWwiseLoadedEv
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadEventAsync"), [this, InEvent = MoveTemp(InEvent), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadEventAsync"), [WeakThis=AsWeak(), InEvent = MoveTemp(InEvent), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -453,7 +465,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadEventAsync(FWwiseLoadedEv
 			}
 			auto* Event = InEvent.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadEventAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -464,7 +482,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadEventAsync(FWwiseLoadedEv
 			}
 			else
 			{
-				UnloadEventNode(MoveTemp(Promise), MoveTemp(Event));
+				SharedResourceLoader->UnloadEventNode(MoveTemp(Promise), MoveTemp(Event));
 			}
 		});
 	}
@@ -521,7 +539,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadExternalSourceAsync(FWwis
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadExternalSourceAsync"), [this, InExternalSource = MoveTemp(InExternalSource), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadExternalSourceAsync"), [WeakThis=AsWeak(), InExternalSource = MoveTemp(InExternalSource), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -543,7 +561,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadExternalSourceAsync(FWwis
 			}
 			auto* ExternalSource = InExternalSource.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadExternalSourceAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -554,7 +578,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadExternalSourceAsync(FWwis
 			}
 			else
 			{
-				UnloadExternalSourceNode(MoveTemp(Promise), MoveTemp(ExternalSource));
+				SharedResourceLoader->UnloadExternalSourceNode(MoveTemp(Promise), MoveTemp(ExternalSource));
 			}
 		});
 	}
@@ -610,7 +634,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadGroupValueAsync(FWwiseLoa
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadGroupValueAsync"), [this, InGroupValue = MoveTemp(InGroupValue), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadGroupValueAsync"), [WeakThis=AsWeak(), InGroupValue = MoveTemp(InGroupValue), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -632,7 +656,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadGroupValueAsync(FWwiseLoa
 			}
 			auto* GroupValue = InGroupValue.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadGroupValueAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -643,7 +673,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadGroupValueAsync(FWwiseLoa
 			}
 			else
 			{
-				UnloadGroupValueNode(MoveTemp(Promise), MoveTemp(GroupValue));
+				SharedResourceLoader->UnloadGroupValueNode(MoveTemp(Promise), MoveTemp(GroupValue));
 			}
 		});
 	}
@@ -699,7 +729,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadInitBankAsync(FWwiseLoade
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadInitBankAsync"), [this, InInitBank = MoveTemp(InInitBank), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadInitBankAsync"), [WeakThis=AsWeak(), InInitBank = MoveTemp(InInitBank), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -721,7 +751,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadInitBankAsync(FWwiseLoade
 			}
 			auto* InitBank = InInitBank.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadInitBankAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -732,7 +768,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadInitBankAsync(FWwiseLoade
 			}
 			else
 			{
-				UnloadInitBankNode(MoveTemp(Promise), MoveTemp(InitBank));
+				SharedResourceLoader->UnloadInitBankNode(MoveTemp(Promise), MoveTemp(InitBank));
 			}
 		});
 	}
@@ -788,7 +824,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadMediaAsync(FWwiseLoadedMe
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadMediaAsync"), [this, InMedia = MoveTemp(InMedia), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadMediaAsync"), [WeakThis=AsWeak(), InMedia = MoveTemp(InMedia), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -810,7 +846,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadMediaAsync(FWwiseLoadedMe
 			}
 			auto* Media = InMedia.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadMediaAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -821,7 +863,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadMediaAsync(FWwiseLoadedMe
 			}
 			else
 			{
-				UnloadMediaNode(MoveTemp(Promise), MoveTemp(Media));
+				SharedResourceLoader->UnloadMediaNode(MoveTemp(Promise), MoveTemp(Media));
 			}
 		});
 	}
@@ -878,7 +920,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadShareSetAsync(FWwiseLoade
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadShareSetAsync"), [this, InShareSet = MoveTemp(InShareSet), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadShareSetAsync"), [WeakThis=AsWeak(), InShareSet = MoveTemp(InShareSet), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -900,7 +942,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadShareSetAsync(FWwiseLoade
 			}
 			auto* ShareSet = InShareSet.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadShareSetAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -911,7 +959,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadShareSetAsync(FWwiseLoade
 			}
 			else
 			{
-				UnloadShareSetNode(MoveTemp(Promise), MoveTemp(ShareSet));
+				SharedResourceLoader->UnloadShareSetNode(MoveTemp(Promise), MoveTemp(ShareSet));
 			}
 		});
 	}
@@ -968,7 +1016,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadSoundBankAsync(FWwiseLoad
 	}
 	else
 	{
-		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadSoundBankAsync"), [this, InSoundBank = MoveTemp(InSoundBank), Promise = MoveTemp(Promise)]() mutable
+		LaunchWwiseTask(WWISERESOURCELOADER_ASYNC_NAME("FWwiseResourceLoader::UnloadSoundBankAsync"), [WeakThis=AsWeak(), InSoundBank = MoveTemp(InSoundBank), Promise = MoveTemp(Promise)]() mutable
 		{
 			{
 				int WaitCount = 0;
@@ -990,7 +1038,13 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadSoundBankAsync(FWwiseLoad
 			}
 			auto* SoundBank = InSoundBank.Get();
 
-			if (!IsEnabled())
+			auto SharedResourceLoader = WeakThis.Pin();
+			if (!SharedResourceLoader.IsValid())
+			{
+				UE_LOG(LogWwiseResourceLoader, Error, TEXT("FWwiseResourceLoader::UnloadInitBankAsync: Failed. ResourceLoader is not valid"))
+				return Promise.EmplaceValue();
+			}
+			if (!SharedResourceLoader->IsEnabled())
 			{
 				UE_LOG(LogWwiseResourceLoader, Warning, TEXT("ResourceLoader is disabled"));
 				Promise.EmplaceValue();
@@ -1001,7 +1055,7 @@ FWwiseResourceUnloadFuture FWwiseResourceLoader::UnloadSoundBankAsync(FWwiseLoad
 			}
 			else
 			{
-				UnloadSoundBankNode(MoveTemp(Promise), MoveTemp(SoundBank));
+				SharedResourceLoader->UnloadSoundBankNode(MoveTemp(Promise), MoveTemp(SoundBank));
 			}
 		});
 	}

@@ -9,7 +9,7 @@ may use this file in accordance with the end user license agreement provided
 with the software or, alternatively, in accordance with the terms contained in a
 written agreement between you and Audiokinetic Inc.
 
-  Copyright (c) 2024 Audiokinetic Inc.
+  Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 #include <AK/SoundEngine/Common/AkSoundEngine.h>    // Sound engine
 #define AK_TRANSLATOR_MAX_NAME_SIZE 150

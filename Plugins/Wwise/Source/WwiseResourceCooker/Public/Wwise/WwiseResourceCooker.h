@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -47,6 +47,8 @@ struct FWwiseGameParameterCookedData;
 struct FWwiseTriggerCookedData;
 struct FWwiseAcousticTextureCookedData;
 class FWwiseCookingCache;
+
+typedef TSharedPtr<FWwiseResourceLoader> FWwiseResourceLoaderPtr;
 
 class WWISERESOURCECOOKER_API IWwiseResourceCooker
 {
@@ -151,8 +153,8 @@ public:
 
 	virtual FWwiseProjectDatabase* GetProjectDatabase() = 0;
 	virtual const FWwiseProjectDatabase* GetProjectDatabase() const = 0;
-	virtual FWwiseResourceLoader* GetResourceLoader() = 0;
-	virtual const FWwiseResourceLoader* GetResourceLoader() const = 0;
+	virtual FWwiseResourceLoaderPtr GetResourceLoader() = 0;
+	virtual const FWwiseResourceLoaderPtr GetResourceLoader() const = 0;
 
 	virtual FWwiseSharedLanguageId GetCurrentLanguage() const = 0;
 	virtual FWwiseSharedPlatformId GetCurrentPlatform() const = 0;

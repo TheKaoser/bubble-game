@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #include "Wwise/WwiseFileHandlerBase.h"
@@ -28,9 +28,9 @@ Copyright (c) 2024 Audiokinetic Inc.
 #include <inttypes.h>
 
 
-FWwiseFileHandlerBase::FWwiseFileHandlerBase() :
-	FileHandlerExecutionQueue(WWISE_EQ_NAME("FWwiseFileHandler"), EWwiseTaskPriority::High)
+FWwiseFileHandlerBase::FWwiseFileHandlerBase()
 {
+	FileHandlerExecutionQueue = new FWwiseExecutionQueue(WWISE_EQ_NAME("FWwiseFileHandler"), EWwiseTaskPriority::High);
 }
 
 FWwiseFileHandlerBase::~FWwiseFileHandlerBase()
@@ -44,6 +44,16 @@ FWwiseFileHandlerBase::~FWwiseFileHandlerBase()
 			// Locking in memory the file states
 			new FWwiseFileStateSharedPtr(State.Value);
 		}
+	}
+	// If we are inside an operation that is currently running and we call delete on the Execution Queue, it will wait forever to close.
+	// So use CloseAndDelete instead
+	if (FileHandlerExecutionQueue->IsRunningInThisThread())
+	{
+		FileHandlerExecutionQueue->CloseAndDelete();
+	}
+	else
+	{
+		delete FileHandlerExecutionQueue;
 	}
 }
 
@@ -121,17 +131,37 @@ void FWwiseFileHandlerBase::CloseStreaming(uint32 InShortId, FWwiseFileState& In
 void FWwiseFileHandlerBase::IncrementFileStateUseAsync(uint32 InShortId, EWwiseFileStateOperationOrigin InOperationOrigin,
 	FCreateStateFunction&& InCreate, FIncrementStateCallback&& InCallback)
 {
-	FileHandlerExecutionQueue.Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseFileHandlerBase::IncrementFileStateUseAsync"), [this, InShortId, InOperationOrigin, InCreate = MoveTemp(InCreate), InCallback = MoveTemp(InCallback)]() mutable
+	FileHandlerExecutionQueue->Async(WWISEFILEHANDLER_ASYNC_NAME
+	("FWwiseFileHandlerBase::IncrementFileStateUseAsync"), [WeakThis=AsWeak(), InShortId, 
+	InOperationOrigin, InCreate = MoveTemp(InCreate), InCallback = MoveTemp(InCallback)]() mutable
 	{
-		IncrementFileStateUse(InShortId, InOperationOrigin, MoveTemp(InCreate), MoveTemp(InCallback));
+		auto SharedFileHandler = WeakThis.Pin();
+		if (!SharedFileHandler.IsValid())
+		{
+			UE_LOG(LogWwiseFileHandler, Error, TEXT("FWwiseFileHandlerBase::IncrementFileStateUseAsync: Failed to get FileHandler"))
+			auto State = InCreate();
+			InCallback(State, false);
+		}
+		else
+		{
+			SharedFileHandler->IncrementFileStateUse(InShortId, InOperationOrigin, MoveTemp(InCreate), MoveTemp(InCallback));
+		}
 	});
 }
 
 void FWwiseFileHandlerBase::DecrementFileStateUseAsync(uint32 InShortId, FWwiseFileState* InFileState, EWwiseFileStateOperationOrigin InOperationOrigin, FDecrementStateCallback&& InCallback)
 {
-	FileHandlerExecutionQueue.Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseFileHandlerBase::DecrementFileStateUseAsync"), [this, InShortId, InFileState, InOperationOrigin, InCallback = MoveTemp(InCallback)]() mutable
+	FileHandlerExecutionQueue->Async(WWISEFILEHANDLER_ASYNC_NAME
+	("FWwiseFileHandlerBase::DecrementFileStateUseAsync"), [WeakThis=AsWeak(), InShortId, InFileState, InOperationOrigin, InCallback = MoveTemp(InCallback)]() mutable
 	{
-		DecrementFileStateUse(InShortId, InFileState, InOperationOrigin, MoveTemp(InCallback));
+		auto SharedFileHandler = WeakThis.Pin();
+		if (!SharedFileHandler.IsValid())
+		{
+			UE_LOG(LogWwiseFileHandler, Error, TEXT("FWwiseFileHandlerBase::IncrementFileStateUseAsync: Failed to get FileHandler"))
+			InCallback();
+			return;
+		}
+		SharedFileHandler->DecrementFileStateUse(InShortId, InFileState, InOperationOrigin, MoveTemp(InCallback));
 	});
 }
 
@@ -174,9 +204,17 @@ void FWwiseFileHandlerBase::IncrementFileStateUse(uint32 InShortId, EWwiseFileSt
 	else
 	{
 		UE_LOG(LogWwiseFileHandler, VeryVerbose, TEXT("Incrementing State for %s %" PRIu32), GetManagingTypeName(), InShortId);
-		State->IncrementCountAsync(InOperationOrigin, [this, InOperationOrigin, State, InCallback = MoveTemp(InCallback)](bool bInResult) mutable
+		State->IncrementCountAsync(InOperationOrigin, [WeakThis=AsWeak(), InOperationOrigin, State, InCallback = MoveTemp(InCallback)](bool bInResult) mutable
 		{
-			OnIncrementCountAsyncDone(bInResult, InOperationOrigin, State, MoveTemp(InCallback));
+			auto SharedFileHandler = WeakThis.Pin();
+			if (!SharedFileHandler.IsValid())
+			{
+				UE_LOG(LogWwiseFileHandler, Error,
+				       TEXT("FWwiseFileHandlerBase::IncrementFileStateUseAsync IncrementCount callback: Failed to get FileHandler"))
+				InCallback(State, false);
+				return;
+			}
+			SharedFileHandler->OnIncrementCountAsyncDone(bInResult, InOperationOrigin, State, MoveTemp(InCallback));
 		});
 	}
 }
@@ -204,12 +242,30 @@ void FWwiseFileHandlerBase::DecrementFileStateUse(uint32 InShortId, FWwiseFileSt
 		}
 	}
 
-	InFileState->DecrementCountAsync(InOperationOrigin, [this, InShortId, InFileState, InOperationOrigin](FDecrementStateCallback&& InCallback) mutable
+	InFileState->DecrementCountAsync(InOperationOrigin, [WeakThis=AsWeak(), InShortId, InFileState, InOperationOrigin] 
+	(FDecrementStateCallback&& InCallback) mutable
 	{
-		// File state deletion request
-		FileHandlerExecutionQueue.Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseFileHandlerBase::DecrementFileStateUse delete"), [this, InShortId, InFileState, InOperationOrigin, InCallback = MoveTemp(InCallback)]() mutable
+		auto SharedFileHandler = WeakThis.Pin();
+		if (!SharedFileHandler.IsValid())
 		{
-			OnDeleteState(InShortId, *InFileState, InOperationOrigin, MoveTemp(InCallback));
+			UE_LOG(LogWwiseFileHandler, Error,
+				   TEXT("FWwiseFileHandlerBase::IncrementFileStateUseAsync DeleteState callback: Failed to get FileHandler"))
+			InCallback();
+			return;
+		}
+		// File state deletion request
+		SharedFileHandler->FileHandlerExecutionQueue->Async(WWISEFILEHANDLER_ASYNC_NAME("FWwiseFileHandlerBase::DecrementFileStateUse delete"),[WeakThis=MoveTemp(WeakThis), InShortId, 
+		InFileState, InOperationOrigin, InCallback = MoveTemp(InCallback)]() mutable
+		{
+			auto SharedFileHandler = WeakThis.Pin();
+			if (!SharedFileHandler.IsValid())
+			{
+				UE_LOG(LogWwiseFileHandler, Error,
+					   TEXT("FWwiseFileHandlerBase::IncrementFileStateUseAsync DecrementCount callback: Failed to get FileHandler"))
+				InCallback();
+				return;
+			}
+			SharedFileHandler->OnDeleteState(InShortId, *InFileState, InOperationOrigin, MoveTemp(InCallback));
 		});
 	}, MoveTemp(InCallback));
 }

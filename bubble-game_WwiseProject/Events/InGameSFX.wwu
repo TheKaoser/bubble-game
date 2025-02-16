@@ -31,17 +31,16 @@
 				</Event>
 				<Event Name="begin_game" ID="{DC564BA6-8846-496A-8470-CD4999114164}">
 					<ChildrenList>
+						<Action Name="" ID="{EE9BD85D-385A-47C3-BCE7-0613438B5C82}" ShortID="503336604">
+							<PropertyList>
+								<Property Name="ActionType" Type="int16" Value="3"/>
+							</PropertyList>
+							<ReferenceList/>
+						</Action>
 						<Action Name="" ID="{38AE2BC4-2627-4170-9337-C9E804377DB9}" ShortID="54875831">
 							<ReferenceList>
 								<Reference Name="Target">
 									<ObjectRef Name="wind" ID="{FBDB7554-9363-44F1-B8AF-86027BA41B6E}" WorkUnitID="{C48F1F3F-0529-4C1F-9DF9-E181F34E2797}"/>
-								</Reference>
-							</ReferenceList>
-						</Action>
-						<Action Name="" ID="{0859A7E4-8432-4668-A76A-1679B29CC980}" ShortID="202124209">
-							<ReferenceList>
-								<Reference Name="Target">
-									<ObjectRef Name="soundscape" ID="{EF8BE07E-80F5-4C94-85F9-066C124A4670}" WorkUnitID="{05533EFA-6611-4398-9618-749AFF574EAD}"/>
 								</Reference>
 							</ReferenceList>
 						</Action>

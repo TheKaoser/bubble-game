@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2024 Audiokinetic Inc.
+Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
 #pragma once
@@ -22,10 +22,12 @@ Copyright (c) 2024 Audiokinetic Inc.
 
 struct FWwiseSoundBankCookedData;
 
+typedef TSharedPtr<IWwiseSoundBankManager> IWwiseSoundBankManagerPtr;
+
 class IWwiseSoundBankManager : public IWwiseStreamableFileHandler
 {
 public:
-	inline static IWwiseSoundBankManager* Get()
+	inline static IWwiseSoundBankManagerPtr Get()
 	{
 		if (auto* Module = IWwiseFileHandlerModule::GetModule())
 		{
